@@ -1,0 +1,1062 @@
+//App.tsx before spliting the routes
+
+// import React from 'react';
+// import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
+// import { selectUser } from './Slices/userSlice/userSlice';
+// import Signup from './pages/user/Signup';
+// import OtpPage from './pages/user/Otp';
+// import LoginPage from './pages/user/Login';
+// import Home from './pages/user/Home';
+// import AdminLogin from './pages/admin/AdminLogin'
+// import AdminDashboard from './pages/admin/AdminDashboard';
+// // import AdminNavbar from './components/Admin/AdminNavbar'
+// // import AdminSidebar from './components/Admin/AdminSidebar'
+// // import Cookies from 'js-cookie';
+
+
+// const PrivateRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+//   const user = useSelector(selectUser);
+//   const isAuthenticated = !!user?.user;
+//   const location = useLocation();
+
+//   return isAuthenticated ? (
+//     <>{element}</>
+//   ) : (
+//     <Navigate to="/login" state={{ from: location }} replace />
+//   );
+// };
+
+// const PublicRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+//   const user = useSelector(selectUser);
+//   const isAuthenticated = !!user?.user;
+
+//   return isAuthenticated ? <Navigate to="/home" replace /> : <>{element}</>;
+// };
+
+// // const PrivateAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+// //   const user = useSelector(selectUser);
+// //   const isAuthenticated = !!user?.admin;
+// //   const location = useLocation();
+
+// //   return isAuthenticated ? (
+// //     <>{element}</>
+// //   ) : (
+// //     <Navigate to="/admin/login" state={{ from: location }} replace />
+// //   );
+// // };
+
+// // const PublicAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+// //   const user = useSelector(selectUser);
+// //   const isAuthenticated = !!user?.admin;
+
+// //   return isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <>{element}</>;
+// // };
+
+// const App: React.FC = () => {
+//   return (
+//     <Router>
+//       <Routes>
+//         <Route path="/signup" element={<PublicRoute element={<Signup />} />} />
+//         <Route path="/otp" element={<PublicRoute element={<OtpPage />} />} />
+//         <Route path="/login" element={<PublicRoute element={<LoginPage />} />} />
+//         <Route path="/home" element={<PrivateRoute element={<Home />} />} />
+//         <Route path="/admin/login" element={<AdminLogin />} />
+//         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
+//       </Routes>
+//     </Router>
+//   );
+// };
+
+// export default App;
+
+
+
+
+
+
+
+import React from 'react';
+import { FaHome, FaUser, FaComments, FaUserFriends, FaWallet, FaNewspaper, FaUsers, FaStream, FaRegFileAlt, FaQuestionCircle } from 'react-icons/fa';
+
+const Sidebar = () => {
+  return (
+    <div className="bg-[#ffff] text-gray-900 w-64 h-screen flex flex-col p-4 drop-shadow-md sticky top-0">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-orange-500">XOX</h1>
+      </div>
+      <div className="flex-1">
+        <ul>
+          <li className="mb-10"><FaHome className="inline-block mr-2" />Home</li>
+          <li className="mb-10">ACCOUNT</li>
+          <li className="mb-6"><FaUser className="inline-block mr-2" />Profile</li>
+          <li className="mb-6"><FaComments className="inline-block mr-2" />Chats</li>
+          <li className="mb-6"><FaUserFriends className="inline-block mr-2" />Friends</li>
+          <li className="mb-10"><FaWallet className="inline-block mr-2" />Wallet</li>
+          <li className="mb-10">MAIN</li>
+          <li className="mb-6"><FaNewspaper className="inline-block mr-2" />News</li>
+          <li className="mb-6"><FaUsers className="inline-block mr-2" />Community</li>
+          <li className="mb-6"><FaUserFriends className="inline-block mr-2" />Members</li>
+          <li className="mb-10"><FaStream className="inline-block mr-2" />Streams</li>
+          <li className="mb-10">ACCOUNT</li>
+          <li className="mb-6"><FaRegFileAlt className="inline-block mr-2" />Report</li>
+          <li className="mb-6"><FaQuestionCircle className="inline-block mr-2" />Help</li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default Sidebar;
+
+
+
+
+
+
+//Home page before changing to components
+
+
+
+// import React, { useEffect } from 'react';
+// import { useAppDispatch, useAppSelector } from '../../store/hooks';
+// import { useNavigate } from 'react-router-dom';
+// import { clearUser, selectUser } from '../../Slices/userSlice/userSlice';
+// import Cookies from 'js-cookie';
+
+// const Home: React.FC = () => {
+//   const dispatch = useAppDispatch();
+//   const navigate = useNavigate();
+//   const user = useAppSelector(selectUser);
+
+//   useEffect(() => {
+//     const token = Cookies.get('accessToken');
+//     if (!token && !user) {
+//       navigate('/login');
+//     }
+//   }, [navigate]);
+
+//   const handleLogout = () => {
+//     dispatch(clearUser());
+//     navigate('/login');
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+//       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+//         <h2 className="text-2xl font-bold mb-4">Welcome, {user?.user?.username || 'User'}!</h2>
+//         <button
+//           onClick={handleLogout}
+//           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+//         >
+//           Logout
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Home;
+
+
+
+
+//otp page before setting the forget pass
+
+
+// import React, { useState, useEffect, ChangeEvent, KeyboardEvent, ClipboardEvent } from 'react';
+// import { Formik, Form, Field, ErrorMessage } from 'formik';
+// import * as Yup from 'yup';
+// import { useAppDispatch } from '../../store/hooks';
+// import { verifyOtp } from '../../Slices/userSlice/userSlice';
+// import { useNavigate, useLocation } from 'react-router-dom';
+
+// interface LocationState {
+//   email: string;
+// }
+
+// const OtpPage: React.FC = () => {
+
+//   const [otp, setOtp] = useState<string[]>(new Array(4).fill(''));
+
+//   const initialValues = {
+//     otp: ''
+//   };
+//   const dispatch = useAppDispatch();
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const state = location.state as LocationState;
+//   const email = state?.email;
+
+//   const validationSchema = Yup.object({
+//     otp: Yup.string()
+//       .required('OTP is required')
+//       .length(4, 'OTP must be exactly 4 digits')
+//       .matches(/^[0-9]{4}$/, 'OTP must be exactly 4 digits')
+//   });
+
+//   const handleChange = (e: ChangeEvent<HTMLInputElement>, index: number, setFieldValue: (field: string, value: any) => void) => {
+//     const { value } = e.target;
+//     if (/^[0-9]$/.test(value)) {
+//       const newOtp = [...otp];
+//       newOtp[index] = value;
+//       setOtp(newOtp);
+//       setFieldValue('otp', newOtp.join(''));
+
+//       if (index < 3 && e.target.nextElementSibling instanceof HTMLInputElement) {
+//         e.target.nextElementSibling.focus();
+//       }
+//     }
+//   };
+
+//   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number, setFieldValue: (field: string, value: any) => void) => {
+//     if (e.key === 'Backspace' || e.key === 'Delete') {
+//       const newOtp = [...otp];
+//       newOtp[index] = '';
+//       setOtp(newOtp);
+//       setFieldValue('otp', newOtp.join(''));
+
+//       // Focus previous input box
+//       if (index > 0 && (e.target as HTMLInputElement).previousElementSibling instanceof HTMLInputElement) {
+//         ((e.target as HTMLInputElement).previousElementSibling as HTMLInputElement).focus();
+//       }
+//     }
+//   };
+
+//   const handlePaste = (e: ClipboardEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void) => {
+//     e.preventDefault();
+//     const text = e.clipboardData.getData('text');
+//     if (/^[0-9]{4}$/.test(text)) {
+//       setOtp(text.split(''));
+//       setFieldValue('otp', text);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const inputs = document.querySelectorAll('#otp-form input[type="text"]') as NodeListOf<HTMLInputElement>;
+//     inputs.forEach((input) => {
+//       input.addEventListener('focus', (e) => (e.target as HTMLInputElement).select());
+//     });
+//   }, []);
+
+//   const handleSubmit = async (otp: string) => {
+//     try {
+//       const response = await dispatch(verifyOtp({ email, otp })).unwrap();
+//       console.log(response);
+//       navigate('/login'); 
+//     } catch (error: any) {
+//       console.error(error.message);
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-gray-100" style={{ backgroundImage: "url('https://pro-theme.com/html/teamhost/assets/img/heading8.jpg')" }}>
+//       {/* <main className="relative min-h-screen flex flex-col justify-center bg-slate-50 overflow-hidden"> */}
+//         <div className="w-full max-w-6xl mx-auto px-4 md:px-6 py-24">
+//           <div className="flex justify-center">
+//             <div className="w-5/6 text-center bg-white px-4 sm:px-8 py-10 rounded-xl shadow">
+//               <header className="mb-8">
+//                 <h1 className="text-2xl font-bold mb-1">Email Verification</h1>
+//                 <p className="text-[15px] text-slate-500">
+//                   Enter the 4-digit verification code that was sent to your email.
+//                 </p>
+//               </header>
+//               <Formik
+//                 initialValues={initialValues}
+//                 validationSchema={validationSchema}
+//                 onSubmit={(values) => {
+//                   handleSubmit(values.otp)
+//                 }}
+//               >
+//                 {({ isSubmitting, setFieldValue }) => (
+//                   <Form id="otp-form">
+//                     <div className="flex items-center justify-center gap-7">
+//                       {otp.map((data, index) => (
+//                         <Field
+//                           key={index}
+//                           type="text"
+//                           name={`otp[${index}]`}
+//                           className="w-14 h-14 text-center text-2xl font-extrabold text-slate-900 bg-slate-100 border border-transparent hover:border-slate-200 appearance-none rounded p-4 outline-none focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+//                           maxLength={1}
+//                           value={data}
+//                           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, index, setFieldValue)}
+//                           onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index, setFieldValue)}
+//                           onPaste={(e: ClipboardEvent<HTMLInputElement>) => handlePaste(e, setFieldValue)}
+//                         />
+//                       ))}
+//                     </div>
+//                     <ErrorMessage name="otp" component="div" className="text-red-500 text-sm mt-2" />
+//                     <div className="max-w-[260px] mx-auto mt-4">
+//                       <button
+//                         type="submit"
+//                         className="w-full inline-flex justify-center whitespace-nowrap rounded-lg bg-indigo-500 px-3.5 py-2.5 text-sm font-medium text-white shadow-sm shadow-indigo-950/10 hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 transition-colors duration-150"
+//                         disabled={isSubmitting}
+//                       >
+//                         Verify Account
+//                       </button>
+//                     </div>
+//                   </Form>
+//                 )}
+//               </Formik>
+//               <div className="text-sm text-slate-500 mt-4">
+//                 Didn't receive code?{' '}
+//                 <a className="font-medium text-indigo-500 hover:text-indigo-600" href="#0">
+//                   Resend
+//                 </a>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       {/* </main> */}
+//      </div>
+//   );
+// };
+
+
+
+
+
+//UserRoute
+
+// import React from 'react';
+// import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
+// import { selectUser } from '../../Slices/userSlice/userSlice';
+// import Signup from '../../pages/user/Signup';
+// import OtpPage from '../../pages/user/Otp';
+// import LoginPage from '../../pages/user/Login';
+// import Home from '../../pages/user/Home';
+// import Profile from '../../pages/user/Profile';
+// import ConfirmMail from '../../pages/user/ConfirmMail';
+// import ConfirmPassword from '../../pages/user/ConfirmPassword';
+
+// const PrivateRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+//   const user = useSelector(selectUser);
+//   const isAuthenticated = !!user?.user;
+//   const location = useLocation();
+
+//   return isAuthenticated ? (
+//     <>{element}</>
+//   ) : (
+//     <Navigate to="/login" state={{ from: location }} replace />
+//   );
+// };
+
+// const PublicRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+//   const user = useSelector(selectUser);
+//   const isAuthenticated = !!user?.user;
+
+//   return isAuthenticated ? <Navigate to="/home" replace /> : <>{element}</>;
+// };
+
+// const UserRoutes: React.FC = () => {
+//   return (
+//     <Routes>
+//       <Route path="/signup" element={<PublicRoute element={<Signup />} />} />
+//       <Route path="/otp" element={<PublicRoute element={<OtpPage />} />} />
+//       <Route path="/login" element={<PublicRoute element={<LoginPage />} />} />
+//       <Route path="/home" element={<PrivateRoute element={<Home />} />} />
+//       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
+//       <Route path="/confirm-mail" element={<PublicRoute element={<ConfirmMail />}/>} />
+//       <Route path="/reset-password" element={<PublicRoute element={<ConfirmPassword />}/>} />
+//     </Routes>
+//   );
+// };
+
+// export default UserRoutes;
+
+
+
+
+
+
+
+
+//AdminRoutes
+
+// import React from 'react';
+// import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
+// import { selectUser } from '../../Slices/userSlice/userSlice';
+// import AdminLogin from '../../pages/admin/AdminLogin';
+// import AdminDashboard from '../../pages/admin/AdminDashboard';
+
+// // const PrivateAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+// //   const user = useSelector(selectUser);
+// //   const isAuthenticated = !!user?.admin;
+// //   const location = useLocation();
+
+// //   return isAuthenticated ? (
+// //     <>{element}</>
+// //   ) : (
+// //     <Navigate to="/admin/login" state={{ from: location }} replace />
+// //   );
+// // };
+
+// // const PublicAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+// //   const user = useSelector(selectUser);
+// //   const isAuthenticated = !!user?.admin;
+
+// //   return isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <>{element}</>;
+// // };
+
+// const AdminRoutes: React.FC = () => {
+//   return (
+//     <Routes>
+//       <Route path="/admin/login" element={<AdminLogin />} />
+//       <Route path="/admin/dashboard" element={<AdminDashboard />} />
+//     </Routes>
+//   );
+// };
+
+// export default AdminRoutes;
+// import React from 'react';
+// import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+// import { useSelector } from 'react-redux';
+// import { selectUser } from '../../Slices/userSlice/userSlice';
+// import AdminLogin from '../../pages/admin/AdminLogin';
+// import AdminDashboard from '../../pages/admin/AdminDashboard';
+
+// const PrivateAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+//   const user = useSelector(selectUser);
+//   const isAuthenticated = !!user?.admin;
+//   const location = useLocation();
+
+//   return isAuthenticated ? (
+//     <>{element}</>
+//   ) : (
+//     <Navigate to="/admin/login" state={{ from: location }} replace />
+//   );
+// };
+
+// const PublicAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
+//   const user = useSelector(selectUser);
+//   const isAuthenticated = !!user?.admin;
+
+//   return isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <>{element}</>;
+// };
+
+// const AdminRoutes: React.FC = () => {
+//   return (
+//     <Routes>
+//       <Route path="/admin/login" element={<AdminLogin />} />
+//       <Route path="/admin/dashboard" element={<PrivateAdminRoute element={<AdminDashboard />} />} />
+//     </Routes>
+//   );
+// };
+
+// export default AdminRoutes;
+
+
+
+
+///UserTitleCard
+
+// import React, { useState } from "react";
+// import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+// import {
+//   UserDetails,
+//   GoogleUser,
+//   UserData,
+//   ImageUploadValues,
+// } from "../../../interfaces/userInterfaces/apiInterfaces";
+// import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+// import { selectUser, updateProfieImage, updateTitleImage } from "../../../Slices/userSlice/userSlice";
+// import ImageUploadModal from "../../Common/ImageUploadModal";
+// import { toast } from "sonner";
+// import { useNavigate } from "react-router-dom";
+
+// interface UserTitleCardProps {
+//   user: UserData | GoogleUser | UserDetails | null;
+//   activeTab: "posts" | "info" | "friends" | "groups";
+// }
+
+// const UserTitleCard: React.FC<UserTitleCardProps> = ({ user, activeTab }) => {
+//   const defaultProfileImage =
+//     "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1719396828~exp=1719400428~hmac=3992078a184c24bf98ee7b06afbab8f3bad2a1d00f616f2b7a906e219f974cb1&w=740";
+//   const defaultTitleImage =
+//     "https://pro-theme.com/html/teamhost/assets/img/heading3.jpg";
+
+//   const ownUser = useAppSelector(selectUser);
+//   const dispatch = useAppDispatch();
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [isProfileImage, setIsProfileImage] = useState(true);
+//   const navigate = useNavigate();
+
+//   const getCachedImageUrl = (imageUrl?: string) => {
+//     return imageUrl ? `${imageUrl}?t=${new Date().getTime()}` : defaultProfileImage;
+//   };
+
+//   const handleImageUpload = async (croppedImage: string, isProfileImage: boolean) => {
+//     try {
+//       const base64String = croppedImage.split(',')[1];
+//       const values: ImageUploadValues = {
+//         userId: ownUser?.id || '',
+//         username: ownUser?.username || '',
+//         profileImage: isProfileImage ? base64String : '',
+//         titleImage: !isProfileImage ? base64String : ''
+//       };
+
+//       let response;
+//       if (isProfileImage) {
+//         response = await dispatch(updateProfieImage(values));
+//       } else {
+//         response = await dispatch(updateTitleImage(values));
+//       }
+
+//       if (updateProfieImage.fulfilled.match(response) || updateTitleImage.fulfilled.match(response)) {
+//         toast.success(isProfileImage ? "Profile image uploaded successfully." : "Title image uploaded successfully.");
+//       } else {
+//         toast.error("Image upload failed.");
+//       }
+//     } catch (error: any) {
+//       toast.error("Image upload failed.");
+//     }
+//   };
+
+//   return (
+//     <>
+//       <div className="h-64 bg-gray-800 p-4 flex flex-col justify-center items-center relative">
+//         <img
+//           src={getCachedImageUrl(user?.titleImage) || defaultTitleImage}
+//           alt="Title"
+//           className="object-cover w-full h-full absolute top-0 left-0 z-0"
+//         />
+//         {activeTab === "info" && (
+//           <button
+//             className="absolute bottom-1 right-1 w-10 h-10 bg-white rounded text-gray-600 hover:text-gray-900"
+//             onClick={() => {
+//               setIsModalOpen(true);
+//               setIsProfileImage(false);
+//             }}
+//           >
+//             <AddPhotoAlternateIcon />
+//           </button>
+//         )}
+//         <div className="flex flex-col items-center">
+//           <div className="w-[120px] h-[120px] rounded-full bg-white mb-2 relative overflow-hidden">
+//             <img
+//               src={getCachedImageUrl(user?.profileImage) || defaultProfileImage}
+//               className="object-cover w-full h-full"
+//               alt="Profile"
+//             />
+//             {activeTab === "info" && (
+//               <button
+//                 className="absolute bottom-0 left-0 w-32 h-10 bg-slate-300 shadow-lg text-gray-600 items-center justify-center hover:text-gray-900"
+//                 onClick={() => {
+//                   setIsModalOpen(true);
+//                   setIsProfileImage(true);
+//                 }}
+//               >
+//                 <AddPhotoAlternateIcon />
+//               </button>
+//             )}
+//           </div>
+//           <h1 className="uk-page-heading-style-a uk-page-heading-h text-white text-xl font-bold z-10">
+//             {user?.username || "User"}
+//           </h1>
+//           <p className="text-white text-base z-10">{user?.bio || ""}</p>
+//         </div>
+//       </div>
+//       <ImageUploadModal
+//         isOpen={isModalOpen}
+//         profile={isProfileImage}
+//         onClose={() => setIsModalOpen(false)}
+//         onSubmit={handleImageUpload}
+//       />
+//     </>
+//   );
+// };
+
+// export default UserTitleCard;
+_______________________________________________
+// import React, { useState, useCallback, useRef } from 'react';
+// import CloseIcon from '@mui/icons-material/Close';
+// import Cropper, { Area } from 'react-easy-crop';
+// import { getCroppedImg } from './canvasUtils';
+// import imageCompression from 'browser-image-compression';
+
+
+// interface ImageUploadModalProps {
+//   isOpen: boolean;
+//   profile: boolean;
+//   onClose: () => void;
+//   onSubmit: (croppedImage: string, isProfileImage: boolean) => void;
+// }
+
+// const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, profile, onClose, onSubmit }) => {
+//   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+//   const [zoom, setZoom] = useState<number>(1);
+//   const [imageSrc, setImageSrc] = useState<string | null>(null);
+//   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+//   const [isDragging, setIsDragging] = useState<boolean>(false);
+
+//   const dropRef = useRef<HTMLDivElement>(null);
+
+//   const handleDragEnter = (e: React.DragEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     setIsDragging(true);
+//   };
+
+//   const handleDragLeave = (e: React.DragEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     setIsDragging(false);
+//   };
+
+//   const handleDragOver = (e: React.DragEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//   };
+
+//   const handleDrop = (e: React.DragEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     setIsDragging(false);
+  
+//     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+//       const file = e.dataTransfer.files[0];
+//       handleFile(file);
+//     }
+//   };
+
+//   const handleFile = async (file: File) => {
+//     try {
+//       const options = {
+//         maxSizeMB: 1, 
+//         maxWidthOrHeight: 1920, 
+//         useWebWorker: true,
+//       };
+  
+//       const compressedFile = await imageCompression(file, options);
+//       const reader = new FileReader();
+//       reader.onload = () => setImageSrc(reader.result as string);
+//       reader.readAsDataURL(compressedFile);
+//     } catch (error) {
+//       console.error('Error compressing image:', error);
+//     }
+//   };
+
+//   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+//     setCroppedAreaPixels(croppedAreaPixels);
+//   }, []);
+
+//   const handleCrop = useCallback(async () => {
+//     if (imageSrc && croppedAreaPixels) {
+//       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+//       console.log('Cropped Image:', croppedImage);
+  
+//       if (croppedImage) {
+//         const base64String = await convertToBase64(croppedImage);
+//         onSubmit(base64String, profile);
+//         setImageSrc(null)
+//         onClose()
+//       } else {
+//         console.error('Cropped image is undefined');
+//       }
+//     }
+//   }, [imageSrc, croppedAreaPixels, onSubmit]);
+  
+//   const convertToBase64 = (blobUrl: string): Promise<string> => {
+//     return new Promise((resolve, reject) => {
+//       fetch(blobUrl)
+//         .then(response => response.blob())
+//         .then(blob => {
+//           const reader = new FileReader();
+//           reader.onloadend = () => {
+//             resolve(reader.result as string);
+//           };
+//           reader.onerror = reject;
+//           reader.readAsDataURL(blob);
+//         })
+//         .catch(reject);
+//     });
+//   };
+  
+//   return isOpen ? (
+//     <div
+//       ref={dropRef}
+//       className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ${isDragging ? 'border-4 border-blue-500' : ''}`}
+//       onDragEnter={handleDragEnter}
+//       onDragLeave={handleDragLeave}
+//       onDragOver={handleDragOver}
+//       onDrop={handleDrop}
+//     >
+//       <div className="relative w-1/2 h-3/4 bg-white rounded-lg" onClick={(e) => e.stopPropagation()}>
+//         <button className="absolute top-4 right-4 text-white z-10" onClick={()=>setImageSrc(null)}>
+//           <CloseIcon />
+//         </button>
+
+//         {imageSrc ? (
+//           <div className="">
+//             <Cropper
+//               image={imageSrc}
+//               crop={crop}
+//               zoom={zoom}
+//               cropShape={profile ? "round" : "rect"}
+//               aspect={profile ? 1 / 1 : 16 / 9}
+//               onCropChange={setCrop}
+//               onCropComplete={onCropComplete}
+//               onZoomChange={setZoom}
+//             />
+//             <button
+//               onClick={handleCrop}
+//               className="absolute bottom-4 left-1/2  bg-white text-black font-sans font-semibold py-2 px-4 rounded"
+//             >
+//               Save
+//             </button>
+//           </div>
+//         ) : (
+//           <div className="flex flex-col items-center justify-center w-full h-full relative">
+//             <img src="/src/assets/images_Logo.png" className="w-28 h-28 mb-5" />
+//             <p>Drag and drop an image here</p>
+//             <p className="font-semibold">Click to select one.</p>
+//             <input
+//               type="file"
+//               accept=".jpg,.jpeg,.png,.gif"
+//               onChange={(e) => {
+//                 const file = e.target.files?.[0];
+//                 if (file) {
+//                   const reader = new FileReader();
+//                   reader.onload = () => setImageSrc(reader.result as string);
+//                   reader.readAsDataURL(file);
+//                 }
+//               }}
+//               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+//             />
+//             <button className="absolute top-4 right-4 text-gray-600 z-10" onClick={onClose}>
+//               <CloseIcon />
+//             </button>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   ) : null;
+// };
+
+// export default ImageUploadModal;
+
+
+
+
+
+////////////////////////////////////////////////////////////////////
+
+// import React, { useEffect, useState } from 'react';
+// import UserTitleCard from '../../components/User/profile/UserTitleCard';
+// import UserProfileCard from '../../components/User/profile/UserProfileCard';
+// import PostFeed from '../../components/User/common/PostFeed';
+// import ProfileTabs from '../../components/User/profile/ProfileTabs';
+// // import FriendsCard from '../../components/User/profile/FriendsCard';
+// import InfoComponent from '../../components/User/profile/InfoComponent';
+// import { useNavigate, useParams } from 'react-router-dom';
+// import { useAppSelector } from '../../store/hooks';
+// import { selectUser } from '../../Slices/userSlice/userSlice';
+// import { GoogleUser, UserData, UserDetails } from '../../interfaces/userInterfaces/apiInterfaces';
+// import axiosInstance from '../../services/userServices/axiosInstance';
+
+// type Tab = 'posts' | 'info' | 'friends' | 'groups';
+
+// const Profile: React.FC = () => {
+//   const [activeTab, setActiveTab] = useState<Tab>('posts');
+//   const [user, setUser] = useState<UserData | GoogleUser | UserDetails | null>(null);
+//   const [ownProfile, setOwnProfile] = useState<boolean>(false);
+//   const { username } = useParams<{ username: string }>();
+//   const loggedInUser = useAppSelector(selectUser);
+//   const navigate = useNavigate()
+
+
+//   const handleProfileUpdate = (username: string) => {
+//     setOwnProfile(true);
+//     navigate(`/${username}`);
+//   };
+
+//   useEffect(() => {
+//     const fetchUserProfile = async () => {
+//       try {
+//         if (loggedInUser?.username === username) {
+//           setUser(loggedInUser);
+//           setOwnProfile(true);
+//         } else {
+//           const { data } = await axiosInstance.get(`/users/${username}`);
+//           setUser(data);
+//           setOwnProfile(false);
+//         }
+//       } catch (error) {
+//         // handle error
+//       }
+//     };
+
+//     fetchUserProfile();
+//   }, [username, loggedInUser, handleProfileUpdate]);
+
+//   const renderContent = () => {
+//     switch (activeTab) {
+//       case 'posts':
+//         return <PostFeed />;
+//       case 'info':
+//         return <InfoComponent onProfileUpdate={handleProfileUpdate} />;
+//       // case 'friends':
+//       //   return <FriendsList />;
+//       // case 'groups':
+//       //   return <GroupsList />;
+//       default:
+//         return <PostFeed />;
+//     }
+//   };
+
+//   return (
+//     <div className="flex bg-gray-100">
+//       <div className="flex-1 flex flex-col">
+//         <div className="grid grid-cols-3 gap-4">
+//           <div className="col-span-3">
+//             <UserTitleCard activeTab={activeTab} user={user} />
+//           </div>
+//           <div className="col-span-3">
+//             <ProfileTabs setActiveTab={setActiveTab} ownProfile={ownProfile} />
+//           </div>
+//           <div style={{scrollbarWidth:'none',WebkitOverflowScrolling:'touch'}} className="col-span-3 overflow-y-scroll h-[53vh]">
+//             {renderContent()}
+//           </div>
+//         </div>
+//       </div>
+//       <div className="w-1/3">
+//         <UserProfileCard user={user} ownProfile={ownProfile} />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Profile;
+
+
+
+
+
+// import React, { useState, useCallback, useEffect } from 'react';
+// import Cropper, { Area } from 'react-easy-crop';
+// import { getCroppedImg } from './canvasUtils';
+
+// interface ImageCropperProps {
+//   imageSrc: string;
+//   profile: boolean;
+//   onCropComplete: (croppedImage: string) => void;
+// }
+
+// const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, profile, onCropComplete }) => {
+//   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+//   const [zoom, setZoom] = useState<number>(1);
+//   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+//   const [aspects, setAspects] = useState<number>(16 / 9)
+
+//   const handleCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+//     setCroppedAreaPixels(croppedAreaPixels);
+//   }, []);
+
+//   const handleSave = useCallback(async () => {
+//     if (imageSrc && croppedAreaPixels) {
+//       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+//       if (croppedImage) {
+//         const base64String = await convertToBase64(croppedImage);
+//         onCropComplete(base64String);
+//       } else {
+//         console.error('Cropped image is undefined');
+//       }
+//     }
+//   }, [imageSrc, croppedAreaPixels, onCropComplete]);
+
+//   const convertToBase64 = (blobUrl: string): Promise<string> => {
+//     return new Promise((resolve, reject) => {
+//       fetch(blobUrl)
+//         .then(response => response.blob())
+//         .then(blob => {
+//           const reader = new FileReader();
+//           reader.onloadend = () => {
+//             resolve(reader.result as string);
+//           };
+//           reader.onerror = reject;
+//           reader.readAsDataURL(blob);
+//         })
+//         .catch(reject);
+//     });
+//   };
+
+//   return (
+//     <div className="relative w-full h-full flex flex-col items-center justify-center">
+//       <Cropper
+//         image={imageSrc}
+//         crop={crop}
+//         zoom={zoom}
+//         cropShape={profile ? "round" : "rect"}
+//         aspect={profile ? 1 / 1 : 16 / 9}
+//         onCropChange={setCrop}
+//         onCropComplete={handleCropComplete}
+//         onZoomChange={setZoom}
+//         style={{
+//           containerStyle: {
+//             width: '100%',
+//             height: '100%',
+//           },
+//         }}
+//       />
+//       <button
+//         onClick={handleSave}
+//         className="absolute bottom-4 bg-white text-black font-sans font-semibold py-2 px-4 rounded"
+//       >
+//         Save
+//       </button>
+//     </div>
+//   );
+// };
+
+// export default ImageCropper;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState, useCallback, useEffect } from 'react';
+import Cropper, { Area } from 'react-easy-crop';
+import { getCroppedImg } from './canvasUtils';
+import Crop32Icon from '@mui/icons-material/Crop32';
+import CropDinIcon from '@mui/icons-material/CropDin';
+import DescriptionModal from './DescriptionModal';
+interface ImageCropperProps {
+    imageSrc: string;
+    profile: boolean;
+    aspectRatio: number;
+    setAspectRatio: (aspectRatio: number) => void; // New prop
+    onCropComplete: (croppedImage: string) => void;
+    isPost: boolean;
+}
+
+const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, profile, aspectRatio, setAspectRatio, onCropComplete, isPost }) => {
+    const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState<number>(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+    const [croppedImage, setCroppedImage] = useState<string | null>(null);
+
+    const handleCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
+
+    const handleSave = useCallback(async () => {
+        if (imageSrc && croppedAreaPixels) {
+            const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+            if (croppedImage) {
+                const base64String = await convertToBase64(croppedImage);
+                setCroppedImage(base64String);
+                if (isPost) {
+                    setIsModalOpen(true); 
+                } else {
+                    onCropComplete(base64String);
+                }
+            } else {
+                console.error('Cropped image is undefined');
+            }
+        }
+    }, [imageSrc, croppedAreaPixels, onCropComplete, isPost]);
+
+
+    const convertToBase64 = (blobUrl: string): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            fetch(blobUrl)
+                .then(response => response.blob())
+                .then(blob => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        resolve(reader.result as string);
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                })
+                .catch(reject);
+        });
+    };
+
+    return (
+        <div className="relative w-full h-full flex flex-col items-center justify-center">
+            <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                cropShape={profile ? "round" : "rect"}
+                aspect={aspectRatio}
+                onCropChange={setCrop}
+                onCropComplete={handleCropComplete}
+                onZoomChange={setZoom}
+                style={{
+                    containerStyle: {
+                        width: '100%',
+                        height: '100%',
+                    },
+                }}
+            />
+            {isPost && (
+                <div className="absolute bottom-24 left-5 flex flex-col ">
+                    <button onClick={() => setAspectRatio(1020 / 400)} className="bg-gray-600 rounded-full p-2 py mb-2">
+                        <Crop32Icon className="text-white" style={{ fontSize: '30px' }} />
+                    </button>
+                    <button onClick={() => setAspectRatio(700 / 400)} className="bg-gray-600 rounded-full p-2">
+                        <CropDinIcon className="text-white" style={{ fontSize: '25px' }} />
+                    </button>
+                </div>
+            )}
+
+            {isPost ? (
+                <>
+                    <button className='absolute bottom-4 bg-white text-black font-sans font-semibold py-2 px-4 rounded' onClick={handleSave}>
+                        Next
+                    </button>
+                    <DescriptionModal
+                        isOpen={isModalOpen}
+                        croppedImage={croppedImage} // Pass cropped image
+                        onClose={() => setIsModalOpen(false)} // Add onClose handler
+                    />
+                </>
+            ) : (
+                <>
+                    <button
+                        onClick={handleSave}
+                        className="absolute bottom-4 bg-white text-black font-sans font-semibold py-2 px-4 rounded"
+                    >
+                        Save
+                    </button>
+                </>
+            )}
+
+
+        </div>
+    );
+};
+
+export default ImageCropper;
+
+
+
+
