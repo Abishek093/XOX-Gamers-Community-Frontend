@@ -57,14 +57,14 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ selectedChat, onBack, ownUser }
       {/* Right-side Buttons */}
       <div className="flex items-center">
         {/* Video Call Button */}
-        <IconButton className="text-white" onClick={handleVideoCall}>
+        {/* <IconButton className="text-white" onClick={handleVideoCall}>
           <VideoCallIcon />
-        </IconButton>
+        </IconButton> */}
 
         {/* Options Button */}
-        <IconButton className="text-white">
+        {/* <IconButton className="text-white">
           <MoreVertIcon />
-        </IconButton>
+        </IconButton> */}
       </div>
     </div>
   );

@@ -10,8 +10,8 @@ import ImageUploadModal from '../../components/Common/ImageUploadModal';
 import Post from '../../components/User/common/Post';
 import EditCommunity from '../../components/User/community/EditCommunity';
 import { useLoading } from '../../context/LoadingContext';
-import io from 'socket.io-client';
-
+import { base64ToBlob, getPresignedUrl, uploadImageToS3 } from '../../Utils/imageUploadHelper';
+import { useSockets } from '../../context/socketContext';
 
 interface CommunityData {
   _id: string;
@@ -19,7 +19,7 @@ interface CommunityData {
   description?: string;
   createdBy: string;
   followers: string[];
-  posts: any[]; 
+  posts: any[];
   postPermission: 'admin' | 'anyone';
   image?: string;
   createdAt: string;
@@ -43,84 +43,162 @@ const Community: React.FC = () => {
 
   const owner = useAppSelector(selectUser);
   const userName = owner?.username;
+  const { contentSocket } = useSockets()
 
-  const fetchCommunityDetails = useCallback(async () => {
-    try {
-      const { data } = await axiosInstance.get(`fetch-community/${communityId}`);
-      setCommunity(data);
-      setPostCount(data.posts.length);
-      setFollowersCount(data.followers.length);
-      checkFollowStatus();
-    } catch (error: any) {
-      toast.error(error.message);
+  useEffect(() => {
+    if (contentSocket && communityId) {
+      contentSocket.emit('join_community', communityId);
+
+      contentSocket.on('community_follower_update', (data: {
+        communityId: string;
+        followerCount: number;
+        followers: any[];
+      }) => {
+        if (data.communityId === communityId) {
+          setFollowersCount(data.followerCount);
+        }
+      });
+
+      return () => {
+        contentSocket.emit('leave_community', communityId);
+        contentSocket.off('community_follower_update');
+      };
     }
-  }, [communityId, owner?.id]);
+  }, [contentSocket, communityId]);
+
+  // const fetchCommunityDetails = useCallback(async () => {
+  //   try {
+  //     const { data } = await axiosInstance.get(`content/communities/fetch-community/${communityId}`);
+  //     setCommunity(data);
+  //     setPostCount(data.posts.length);
+  //     // setFollowersCount(data.followers.length);
+  //     checkFollowStatus();
+  //     fetchCommunityFollowers()
+  //   } catch (error: any) {
+  //     toast.error(error.message);
+  //   }
+  // }, [communityId, owner?.id]);
+
+  // useEffect(() => {
+  //   fetchCommunityDetails();
+  // }, [fetchCommunityDetails]);
+  const fetchCommunityDetails = useCallback(async () => {
+    if (!communityId) return;
+
+    try {
+      const { data } = await axiosInstance.get(`content/communities/fetch-community/${communityId}`);
+      if (data) {
+        setCommunity(data);
+        setPostCount(data.posts?.length || 0);
+        checkFollowStatus();
+        fetchCommunityFollowers();
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Error fetching community details');
+    }
+  }, [communityId]);
 
   useEffect(() => {
     fetchCommunityDetails();
   }, [fetchCommunityDetails]);
 
-  useEffect(() => {
-    const socket = io('http://localhost:3000'); // Replace with your server URL
 
-    socket.on('connect', () => {
-      console.log('Connected to server');
-      socket.emit('joinCommunity', communityId);
-    });
 
-    socket.on('updateFollowerCount', ({ communityId: updatedCommunityId, followerCount }: FollowerCountUpdate) => {
-      if (updatedCommunityId === communityId) {
-        setFollowersCount(followerCount);
-      }
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [communityId]);
 
   const checkFollowStatus = async () => {
     try {
-      const { data } = await axiosInstance.get(`/follower/${owner?.id}/community/${communityId}`);
+      const { data } = await axiosInstance.get(`content/communities/follower/${owner?.id}/community/${communityId}`);
       setFollowStatus(data.isFollowing);
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
+  const fetchCommunityFollowers = async () => {
+    try {
+      const result = await axiosInstance.get(`content/communities/fetchFollowers/${communityId}`)
+      console.log('result', result)
+      console.log('result.data', result.data.length)
+      setFollowersCount(result.data.length)
+    } catch (error) {
+      toast.error('Error fetching followers')
+    }
+  }
+
+  // const handleFollow = async () => {
+  //   try {
+  //     await axiosInstance.post(`content/communities/follow/${communityId}/user/${owner?.id}`);
+  //     setFollowStatus(true);
+  //     toast.success("Successfully followed the community");
+  //   } catch (error: any) {
+  //     toast.error(error.message);
+  //   }
+  // };
+
+  // const handleUnfollow = async () => {
+  //   try {
+  //     await axiosInstance.delete(`/unfollow/${communityId}/user/${owner?.id}`);
+  //     setFollowStatus(false);
+  //     toast.success("Successfully unfollowed the community");
+  //   } catch (error: any) {
+  //     toast.error(error.message);
+  //   }
+  // };
+
   const handleFollow = async () => {
     try {
-      await axiosInstance.post(`/follow/${communityId}/user/${owner?.id}`);
+      await axiosInstance.post(`content/communities/follow/${communityId}/user/${owner?.id}`);
       setFollowStatus(true);
-      // We'll let the socket update handle the follower count
+
+      if (contentSocket) {
+        contentSocket.emit('community_follow_action', {
+          communityId,
+          userId: owner?.id,
+          action: 'follow'
+        });
+      }
+
       toast.success("Successfully followed the community");
     } catch (error: any) {
       toast.error(error.message);
     }
   };
-  
+
   const handleUnfollow = async () => {
     try {
-      await axiosInstance.delete(`/unfollow/${communityId}/user/${owner?.id}`);
+      await axiosInstance.delete(`content/communities//unfollow/${communityId}/user/${owner?.id}`);
       setFollowStatus(false);
-      // We'll let the socket update handle the follower count
+
+      if (contentSocket) {
+        contentSocket.emit('community_follow_action', {
+          communityId,
+          userId: owner?.id,
+          action: 'unfollow'
+        });
+      }
+
       toast.success("Successfully unfollowed the community");
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
-
   const handlePostCreation = async (croppedImage: string, _isProfileImage?: boolean, description?: string) => {
     setLoading(true);
     try {
-      const base64String = croppedImage.split(",")[1];
-      const result = await axiosInstance.post(`community-post`, { userName, croppedImage: base64String, description, communityId });
-      if (result.status === 200) {
-        toast.success("Post added successfully");
-        const { data } = await axiosInstance.get(`fetch-community/${communityId}`);
-        setCommunity(data);
-        setPostCount(data.posts.length);
+      if (owner?.id) {
+        const base64String = croppedImage.split(",")[1];
+        const imageBlob = base64ToBlob(base64String, 'image/jpeg');
+        const { uploadUrl, key } = await getPresignedUrl(owner?.id, 'community-post', `content/posts/`);
+        await uploadImageToS3(uploadUrl, imageBlob);
+        const postImageUrl = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${key}`;
+        const result = await axiosInstance.post(`content/communities/community-post`, { userName, postImageUrl, description, communityId });
+        if (result.status === 200) {
+          toast.success("Post added successfully");
+          const { data } = await axiosInstance.get(`content/communities/fetch-community/${communityId}`);
+          setCommunity(data);
+          setPostCount(data.posts.length);
+        }
       }
     } catch (error: any) {
       toast.error(error.message);
@@ -129,14 +207,15 @@ const Community: React.FC = () => {
     }
   };
 
-  const handleCommunityUpdate = (updatedCommunity: any) => {
+  const handleCommunityUpdate = async (updatedCommunity: any) => {
     setCommunity(updatedCommunity);
-    setIsAdminView(true); 
+    setIsAdminView(true);
+    await fetchCommunityDetails();
   };
 
   const handleRemovePost = async (postId: string) => {
     try {
-      await axiosInstance.delete(`/community-post/${postId}`);
+      await axiosInstance.delete(`content/communities/community-post/${postId}`);
       setCommunity((prevCommunity) => {
         if (prevCommunity) {
           const updatedPosts = prevCommunity.posts.filter((post) => post._id !== postId);
@@ -154,104 +233,237 @@ const Community: React.FC = () => {
     }
   };
 
+  //   return (
+  //     <div className="relative p-4 h-[91vh] flex flex-col">
+  //       <div className="flex-shrink-0">
+  //         <CommunityTitleCard
+  //           image={community?.image}
+  //           name={community?.name}
+  //           description={community?.description}
+  //           postCount={postCount}
+  //           followersCount={followersCount}
+  //           isFollowing={followStatus}
+  //           onFollowToggle={followStatus ? handleUnfollow : handleFollow}
+  //         />
+  //       </div>
+
+  //       {/* Admin Control Bar */}
+  //       {owner?.id === community?.createdBy && (
+  //         <div className="flex justify-center my-4 space-x-4">
+  //           <button
+  //             className={`flex items-center px-6 py-2 rounded-full transition-all duration-300 transform ${isAdminView
+  //               ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:scale-105'
+  //               : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+  //               }`}
+  //             onClick={() => setIsAdminView(true)}
+  //           >
+  //             <FaListAlt className="mr-2" />
+  //             Posts
+  //           </button>
+  //           <button
+  //             className={`flex items-center px-6 py-2 rounded-full transition-all duration-300 transform ${!isAdminView
+  //               ? 'bg-gradient-to-r from-green-400 to-teal-500 text-white shadow-lg hover:scale-105'
+  //               : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+  //               }`}
+  //             onClick={() => setIsAdminView(false)}
+  //           >
+  //             <FaEdit className="mr-2" />
+  //             Edit Community
+  //           </button>
+  //         </div>
+  //       )}
+
+  //       {/* Floating Create Post Button */}
+  //       {(community?.postPermission === 'anyone' && followStatus === true || owner?.id === community?.createdBy) && (
+  //         <button
+  //           className="fixed bottom-8 right-8 z-50 flex items-center justify-center w-16 h-16 bg-gradient-to-r from-pink-500 to-red-600 text-white rounded-full shadow-lg hover:scale-105 transition-all duration-300 transform"
+  //           onClick={() => setIsModalOpen(true)}
+  //         >
+  //           <FaPlus className="text-2xl" />
+  //         </button>
+  //       )}
+
+  //       <div className="flex-grow">
+  //         {owner?.id === community?.createdBy ? (
+  //           isAdminView ? (
+  //             <div style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }} className="col-span-3 overflow-y-scroll h-[53vh]">
+  //               {community?.posts.map((post) => (
+  //                 <Post
+  //                   key={post._id}
+  //                   user={post.author}
+  //                   post={post}
+  //                   removePost={handleRemovePost}
+  //                 />
+  //               ))}
+  //             </div>
+  //           ) : (
+  //             community && (
+  //               <div style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }} className="col-span-3 overflow-y-scroll h-[53vh]">
+  //                 <EditCommunity
+  //                   community={community}
+  //                   onCommunityUpdate={handleCommunityUpdate}
+  //                 />
+  //               </div>
+  //             )
+  //           )
+  //         ) : (
+  //           <div style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }} className="col-span-3 overflow-y-scroll h-[53vh]  my-4 space-x-4">
+  //             {community?.posts.map((post) => (
+  //               <Post
+  //                 key={post._id}
+  //                 user={post.author}
+  //                 post={post}
+  //                 removePost={handleRemovePost}
+  //               />
+  //             ))}
+  //           </div>
+  //         )}
+  //       </div>
+
+  //       {isModalOpen && (
+  //         <ImageUploadModal
+  //           isOpen={isModalOpen}
+  //           profile={false}
+  //           onClose={() => setIsModalOpen(false)}
+  //           onSubmit={handlePostCreation}
+  //           isPost={true}
+  //         />
+  //       )}
+  //     </div>
+  //   );
+  // };
+
+
   return (
     <div className="relative p-4 h-[91vh] flex flex-col">
       <div className="flex-shrink-0">
-        <CommunityTitleCard
-          image={community?.image}
-          name={community?.name}
-          description={community?.description}
-          postCount={postCount}
-          followersCount={followersCount}
-          isFollowing={followStatus}
-          onFollowToggle={followStatus ? handleUnfollow : handleFollow}
-        />
+        {community && (
+          <CommunityTitleCard
+            image={community.image}
+            name={community.name}
+            description={community.description}
+            postCount={postCount}
+            followersCount={followersCount}
+            isFollowing={followStatus}
+            onFollowToggle={followStatus ? handleUnfollow : handleFollow}
+          />
+        )}
       </div>
 
-        {/* Admin Control Bar */}
-        {owner?.id === community?.createdBy && (
-          <div className="flex justify-center my-4 space-x-4">
-            <button
-              className={`flex items-center px-6 py-2 rounded-full transition-all duration-300 transform ${isAdminView
-                ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:scale-105'
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                }`}
-              onClick={() => setIsAdminView(true)}
-            >
-              <FaListAlt className="mr-2" />
-              Posts
-            </button>
-            <button
-              className={`flex items-center px-6 py-2 rounded-full transition-all duration-300 transform ${!isAdminView
-                ? 'bg-gradient-to-r from-green-400 to-teal-500 text-white shadow-lg hover:scale-105'
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                }`}
-              onClick={() => setIsAdminView(false)}
-            >
-              <FaEdit className="mr-2" />
-              Edit Community
-            </button>
-          </div>
-        )}
-
-        {/* Floating Create Post Button */}
-        {(community?.postPermission === 'anyone' || owner?.id === community?.createdBy) && (
+      {owner?.id === community?.createdBy && (
+        <div className="flex justify-center my-4 space-x-4">
           <button
-            className="fixed bottom-8 right-8 z-50 flex items-center justify-center w-16 h-16 bg-gradient-to-r from-pink-500 to-red-600 text-white rounded-full shadow-lg hover:scale-105 transition-all duration-300 transform"
-            onClick={() => setIsModalOpen(true)}
+            className={`flex items-center px-6 py-2 rounded-full transition-all duration-300 transform ${isAdminView
+              ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg hover:scale-105'
+              : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              }`}
+            onClick={() => setIsAdminView(true)}
           >
-            <FaPlus className="text-2xl" />
+            <FaListAlt className="mr-2" />
+            Posts
           </button>
-        )}
-
-        <div className="flex-grow">
-          {owner?.id === community?.createdBy ? (
-            isAdminView ? (
-              <div style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }} className="col-span-3 overflow-y-scroll h-[53vh]">
-                {community?.posts.map((post) => (
+          <button
+            className={`flex items-center px-6 py-2 rounded-full transition-all duration-300 transform ${!isAdminView
+              ? 'bg-gradient-to-r from-green-400 to-teal-500 text-white shadow-lg hover:scale-105'
+              : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              }`}
+            onClick={() => setIsAdminView(false)}
+          >
+            <FaEdit className="mr-2" />
+            Edit Community
+          </button>
+        </div>
+      )}
+      {(community?.postPermission === 'anyone' && followStatus === true || owner?.id === community?.createdBy) && (
+        <button
+          className="fixed bottom-8 right-8 z-50 flex items-center justify-center w-16 h-16 bg-gradient-to-r from-pink-500 to-red-600 text-white rounded-full shadow-lg hover:scale-105 transition-all duration-300 transform"
+          onClick={() => setIsModalOpen(true)}
+        >
+          <FaPlus className="text-2xl" />
+        </button>
+      )}
+      <div className="flex-grow">
+        {owner?.id === community?.createdBy ? (
+          isAdminView ? (
+            <div
+              style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+              className="col-span-3 overflow-y-scroll h-[53vh]"
+            >
+              {community?.posts && community.posts.length > 0 ? (
+                community.posts.map((post) => (
                   <Post
                     key={post._id}
                     user={post.author}
                     post={post}
                     removePost={handleRemovePost}
                   />
-                ))}
-              </div>
-            ) : (
-              community && (
-                <div style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }} className="col-span-3 overflow-y-scroll h-[53vh]">
-                  <EditCommunity
-                    community={community}
-                    onCommunityUpdate={handleCommunityUpdate}
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[53vh] bg-white">
+                  <img
+                    src="/src/assets/NoImages.png"
+                    alt="No content available"
+                    className="h-20"
                   />
+                  <p className="mt-4 text-gray-600 text-md font-sans font-semibold">
+                    No posts yet!
+                  </p>
                 </div>
-              )
-            )
+              )}
+            </div>
           ) : (
-            <div style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }} className="col-span-3 overflow-y-scroll h-[53vh]">
-              {community?.posts.map((post) => (
+            community && (
+              <div
+                style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+                className="col-span-3 overflow-y-scroll h-[53vh]"
+              >
+                <EditCommunity
+                  community={community}
+                  onCommunityUpdate={handleCommunityUpdate}
+                />
+              </div>
+            )
+          )
+        ) : (
+          <div
+            style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
+            className="col-span-3 overflow-y-scroll h-[53vh] my-4 space-x-4"
+          >
+            {community?.posts && community.posts.length > 0 ? (
+              community.posts.map((post) => (
                 <Post
                   key={post._id}
                   user={post.author}
                   post={post}
                   removePost={handleRemovePost}
                 />
-              ))}
-            </div>
-          )}
-        </div>
-        
-        {isModalOpen && (
-          <ImageUploadModal
-            isOpen={isModalOpen}
-            profile={false}
-            onClose={() => setIsModalOpen(false)}
-            onSubmit={handlePostCreation}
-            isPost={true}
-          />
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center h-[53vh] bg-white">
+                <img
+                  src="/src/assets/NoImages.png"
+                  alt="No content available"
+                  className="h-20"
+                />
+                <p className="mt-4 text-gray-600 text-md font-sans font-semibold">
+                  No posts yet!
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
-    );
-  };
 
-  export default Community;
+      {isModalOpen && (
+        <ImageUploadModal
+          isOpen={isModalOpen}
+          profile={false}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handlePostCreation}
+          isPost={true}
+        />
+      )}
+    </div>
+  );
+}
+export default Community;

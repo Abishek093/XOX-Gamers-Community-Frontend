@@ -13,7 +13,7 @@ const Communities: React.FC = () => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
-        const { data } = await axiosInstance.get<ICommunityWithCounts[]>('fetch-all-communities');
+        const { data } = await axiosInstance.get<ICommunityWithCounts[]>('content/communities/fetch-all-communities');
         setCommunities(data);
       } catch (error: any) {
         toast.error(error.message);

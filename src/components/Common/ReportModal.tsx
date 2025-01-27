@@ -16,7 +16,7 @@ const ReportModal: React.FC<ReportModalProps> = ({ isOpen, onClose, onSubmit }) 
   useEffect(() => {
     const fetchReasons = async () => {
       try {
-        const response = await axiosInstance.get('report-reasons');
+        const response = await axiosInstance.get('content/posts/report-reasons');
         setReportingReasons(response.data);
       } catch (error) {
         console.error('Error fetching reporting reasons:', error);

@@ -23,12 +23,12 @@ export const loginAdmin = createAsyncThunk<AdminLoginResponse, AdminLoginPayload
       // localStorage.setItem('token', response.token);
       Cookies.set('AdminRefreshToken', response.refreshToken,{
         sameSite: 'strict',
-        expires: 1/96
+        expires: 7 
       });
 
       Cookies.set('AdminAccessToken', response.accessToken,{
         sameSite: 'strict',
-        expires: 7
+        expires: 1/96
       });
       return response;
     } catch (error: any) {
@@ -36,6 +36,30 @@ export const loginAdmin = createAsyncThunk<AdminLoginResponse, AdminLoginPayload
     }
   }
 );
+
+// export const loginAdmin = createAsyncThunk<AdminLoginResponse, AdminLoginPayload>(
+//   'admin/loginUser',
+//   async (loginDetails, { rejectWithValue }) => {
+//     try {
+//       const response = await adminLogin(loginDetails);
+
+//       Cookies.set('AdminRefreshToken', response.refreshToken, {
+//         sameSite: 'strict',
+//         // No `expires` property for session persistence
+//       });
+
+//       Cookies.set('AdminAccessToken', response.accessToken, {
+//         sameSite: 'strict',
+//         // No `expires` property for session persistence
+//       });
+
+//       return response;
+//     } catch (error: any) {
+//       return rejectWithValue(error.message);
+//     }
+//   }
+// );
+
 
 export const clearAdmin = createAsyncThunk<void, void>(
   'user/clearUser',

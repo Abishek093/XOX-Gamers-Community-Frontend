@@ -10,6 +10,7 @@
     import { BsThreeDotsVertical } from 'react-icons/bs';
     import PostOptionModal from './PostOptionModal';
     import { toast } from 'sonner';
+    import { useSockets } from '../../../context/socketContext'; 
 
     const styles = {
       largeIcon: {
@@ -34,7 +35,16 @@
       removePost: (postId: string) => void;
     }
 
+    interface PostLikeUpdate {
+      likeCount: number;
+      likedByUsers: string[];
+    }
+
     const Post: React.FC<PostProps> = ({ post, user, removePost }) => {
+
+      const { contentSocket } = useSockets();
+
+
       const [isLiked, setIsLiked] = useState(false);
       const [isOpen, setIsOpen] = useState(false);
       const [optionMenu, setOptionMenu] = useState(false)
@@ -42,36 +52,165 @@
       const [reportModal, setReportModal] = useState(false)
       const ownUser = useAppSelector(selectUser);
       const userId = ownUser?.id;
+      const [likeCount, setLikeCount]= useState(post.likeCount)
+
+      // useEffect(() => {
+      //   if (contentSocket) {
+      //     // Join post room on mount
+      //     contentSocket.emit('join_post', post._id);
+    
+      //     // Listen for like updates for this specific post
+      //     contentSocket.on(`post_like_update_${post._id}`, (data: { likeCount: number, liked: boolean, userId: string }) => {
+      //       setLikeCount(data.likeCount);
+      //       // Update isLiked only if the action was performed by the current user
+      //       if (data.userId === ownUser?.id) {
+      //         setIsLiked(data.liked);
+      //       }
+      //     });
+      //   }
+    
+      //   return () => {
+      //     if (contentSocket) {
+      //       // Leave post room on unmount
+      //       contentSocket.emit('leave_post', post._id);
+      //       contentSocket.off(`post_like_update_${post._id}`);
+      //     }
+      //   };
+      // }, [contentSocket, post._id, ownUser?.id]);
 
       const API_URL = import.meta.env.VITE_CONTENT_SERVICE_API_URL;
-      // console.log('.......post',post)
+      // useEffect(() => {
+      //   const checkLikeStatus = async () => {
+      //     const PostId = post._id;
+      //     const UserId = ownUser?.id;
+      //     try {
+      //       const response = await axiosInstance.post(`${API_URL}posts/check-like`, { postId: PostId, userId: UserId });
+      //       setIsLiked(response.data.liked);
+      //     } catch (error) {
+      //       console.error('Error checking like status:', error);
+      //     }
+      //   };
+
+      //   checkLikeStatus();
+      // }, [post._id, ownUser?.id, API_URL]);
+
+      // // const handleLikeClick = async () => {
+      // //   try {
+      // //     const action = isLiked ? 'unlike' : 'like';
+      // //     await axiosInstance.post(`${API_URL}posts/${action}-post`, {
+      // //       userId: ownUser?.id,
+      // //       postId: post._id,
+      // //     });
+      // //     setIsLiked(!isLiked);
+      // //   } catch (error) {
+      // //     console.error(`Error ${isLiked ? 'unliking' : 'liking'} the post`, error);
+      // //   }
+      // // };
+      // const handleLikeClick = async () => {
+      //   try {
+      //     const action = isLiked ? 'unlike' : 'like';
+          
+      //     // Optimistic update
+      //     setIsLiked(!isLiked);
+      //     setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+    
+      //     await axiosInstance.post(`${API_URL}posts/${action}-post`, {
+      //       userId: ownUser?.id,
+      //       postId: post._id,
+      //     });
+          
+      //     // Emit socket event for real-time updates
+      //     contentSocket?.emit('post_like_action', {
+      //       postId: post._id,
+      //       userId: ownUser?.id,
+      //       action: action
+      //     });
+      //   } catch (error) {
+      //     // Revert optimistic update on error
+      //     setIsLiked(isLiked);
+      //     setLikeCount(likeCount);
+      //     console.error(`Error ${isLiked ? 'unliking' : 'liking'} the post`, error);
+      //   }
+      // };
+
+      useEffect(() => {
+        if (contentSocket) {
+          // Join post room on mount
+          contentSocket.emit('join_post', post._id);
+    
+          // Add proper type checking and error handling
+          contentSocket.on(`post_like_update_${post._id}`, (data: PostLikeUpdate) => {
+            console.log("Received socket update:", data); // Debug log
+            
+            if (data && typeof data.likeCount === 'number') {
+              setLikeCount(data.likeCount);
+            }
+            
+            // Safe check for likedByUsers array
+            if (data && Array.isArray(data.likedByUsers) && ownUser?.id) {
+              setIsLiked(data.likedByUsers.includes(ownUser.id));
+            }
+          });
+        }
+    
+        return () => {
+          if (contentSocket) {
+            contentSocket.emit('leave_post', post._id);
+            contentSocket.off(`post_like_update_${post._id}`);
+          }
+        };
+      }, [contentSocket, post._id, ownUser?.id]);
+    
+      // Initial like status check
       useEffect(() => {
         const checkLikeStatus = async () => {
-          const PostId = post._id;
-          const UserId = ownUser?.id;
           try {
-            const response = await axiosInstance.post(`${API_URL}posts/check-like`, { postId: PostId, userId: UserId });
+            const response = await axiosInstance.post(`${API_URL}posts/check-like`, { 
+              postId: post._id, 
+              userId: ownUser?.id 
+            });
             setIsLiked(response.data.liked);
           } catch (error) {
             console.error('Error checking like status:', error);
           }
         };
-
-        checkLikeStatus();
-      }, [post._id, ownUser?.id, API_URL]);
-
+    
+        if (ownUser?.id) {
+          checkLikeStatus();
+        }
+      }, [post._id, ownUser?.id]);
+    
       const handleLikeClick = async () => {
+        if (!ownUser?.id) return;
+    
         try {
           const action = isLiked ? 'unlike' : 'like';
+          
+          // Optimistic update
+          setIsLiked(!isLiked);
+          setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+    
           await axiosInstance.post(`${API_URL}posts/${action}-post`, {
-            userId: ownUser?.id,
+            userId: ownUser.id,
             postId: post._id,
           });
-          setIsLiked(!isLiked);
+    
+          // Emit socket event for real-time updates
+          if (contentSocket) {
+            contentSocket.emit('post_like_action', {
+              postId: post._id,
+              userId: ownUser.id,
+              action: action
+            });
+          }
         } catch (error) {
+          // Revert optimistic update on error
+          setIsLiked(isLiked);
+          setLikeCount(likeCount);
           console.error(`Error ${isLiked ? 'unliking' : 'liking'} the post`, error);
         }
       };
+
 
       const handleUpdatPost = async(description: string, croppedImage: string|null) =>{
         const postId = post._id
@@ -84,7 +223,7 @@
         try {
           const postId = post._id
           const userId = ownUser?.id;
-          const response = await axiosInstance.post(`report-post`,{userId, postId, reason})
+          await axiosInstance.post(`content/posts/report-post`,{userId, postId, reason})
             setReportModal(false)
             setOptionMenu(false)
             toast.success('Report addes successfully')
@@ -125,7 +264,7 @@
                 onClick={handleLikeClick}
               />
               <Typography variant="body2" color="textSecondary" sx={{ marginRight: 2 }}>
-                {post.likeCount} {post.likeCount === 1 ? 'like' : 'likes'}
+                {likeCount} {likeCount === 1 ? 'like' : 'likes'}
               </Typography>
             </Box>
             <Button

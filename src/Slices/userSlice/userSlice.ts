@@ -5,10 +5,11 @@ import { signup, verifyOtpApi, UpdatePasswordApi, login,
   updateUserApi, confirmMailApi, verifyResetOtpApi, 
   updateTitleImageApi,
   updateProfileImageApi} from '../../services/userServices/api';
-import { LoginPayload,UserApiData, UserData, VerifyOtpPayload, VerifyOtpResponse, LoginResponse, GoogleUser, AuthenticatedUser, UpdateUser, UpdateUserResponse, ConfirmMailRequest, ConfirmMailResponse, verifyResetOtpResponse, UpdatePasswordRequest, UpdatePasswordResponse, ImageUploadValues, ImageUploadResponse} from '../../interfaces/userInterfaces/apiInterfaces';
+import { LoginPayload,UserApiData, UserData, VerifyOtpPayload, VerifyOtpResponse, LoginResponse, GoogleUser, AuthenticatedUser, UpdateUser, UpdateUserResponse, ConfirmMailRequest, ConfirmMailResponse, verifyResetOtpResponse, UpdatePasswordRequest, UpdatePasswordResponse} from '../../interfaces/userInterfaces/apiInterfaces';
 import { UserState } from '../../interfaces/userInterfaces/storeInterfaces';
 import Cookies from 'js-cookie';
 import { RootState } from '../../store';
+import { useNavigate } from 'react-router-dom';
 
 const initialState: UserState = {
   user: null,
@@ -198,7 +199,9 @@ export const clearUser = createAsyncThunk<void, void>(
   async (_, { dispatch }) => {
     dispatch(logout());
     Cookies.remove('UserAccessToken');
-    Cookies.remove('UserRefreshToken');  }
+    Cookies.remove('UserRefreshToken');
+
+  }
 );
 
 
@@ -215,22 +218,55 @@ export const verifyResetOtp = createAsyncThunk<verifyResetOtpResponse, VerifyOtp
   }
 );
 
+export const logout = createAsyncThunk(
+  'user/logout',
+  async (_, { dispatch }) => {
+    // Clear user data
+    Cookies.remove('UserAccessToken');
+    Cookies.remove('UserRefreshToken');
+    
+    // Optional: Disconnect sockets if applicable
+    // socketService.disconnect();
+    
+    // Redirect to login
+    window.location.href = '/login';
+  }
+);
 
+// export const userSlice = createSlice({
+//   name: 'user',
+//   initialState,
+//   reducers: {
+//     logout(state) {
+//       state.user = null;
+//       state.status = 'idle';
+//       state.error = null;
+//       state.otpStatus = 'idle';
+//       state.otpError = null;
+//       state.email = null;
+//     },
+//   },
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    logout(state) {
+    // Existing or new clear state method
+    clearUserState(state) {
       state.user = null;
       state.status = 'idle';
       state.error = null;
       state.otpStatus = 'idle';
       state.otpError = null;
       state.email = null;
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
+    .addCase(logout.fulfilled, (state) => {
+      state.user = null;
+      state.status = 'idle';
+      state.error = null;
+    })
       .addCase(signupUser.pending, (state) => {
         state.status = 'loading';
         state.error = null;
@@ -391,7 +427,9 @@ export const userSlice = createSlice({
   },
 });
 
-export const { logout } = userSlice.actions;
+// export const { logout } = userSlice.actions;
+export const { clearUserState } = userSlice.actions;
+
 
 // export const selectUser = (state: { user: UserState }) => state.auth.user;
 // export const selectStatus = (state: { user: UserState }) => state.user.status;

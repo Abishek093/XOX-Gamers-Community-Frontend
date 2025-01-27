@@ -57,8 +57,8 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({ setActiveTab, ownProfile }) =
 
   const tabs = [
     { id: 'posts', label: 'Posts', icon: FaFileImage },
-    { id: 'groups', label: 'Groups', icon: FaGamepad },
-    { id: 'friends', label: 'Friends', icon: FaUserFriends },
+    // { id: 'groups', label: 'Groups', icon: FaGamepad },
+    // { id: 'friends', label: 'Friends', icon: FaUserFriends },
     { id: 'info', label: 'Info', icon: FaInfo },
   ];
 

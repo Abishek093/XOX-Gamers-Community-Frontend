@@ -3,15 +3,17 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import { selectAdmin } from '../../Slices/adminSlice/adminSlice';
 
-const   AdminPrivateRoute: React.FC = () => {
+const AdminPrivateRoute: React.FC = () => {
   const admin = useAppSelector(selectAdmin);
+  console.log("Admin: ", admin)
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!admin) {
-      navigate('/admin/login');
+  useEffect(()=>{
+    if(!admin){
+      navigate('admin/login')
     }
-  }, [admin, navigate]);
+  }, [admin, navigate])
+
 
   return admin ? <Outlet /> : null;
 };

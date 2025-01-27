@@ -56,7 +56,7 @@ const PostOptionModal: React.FC<PostOptionModalProps> = ({
 
   const handleDeletePost = async () => {
     try {
-      await axiosInstance.delete(`delete-post/${postId}`);
+      await axiosInstance.delete(`content/posts/delete-post/${postId}`);
       toast.success("Post deleted successfully")
       setShowDeleteConfirmation(false)
       onClose()     

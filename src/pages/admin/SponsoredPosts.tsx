@@ -1,4 +1,4 @@
-import axios from 'axios';
+import adminAxiosInstance from '../../../src/services/adminServices/adminAxiosInstance';
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -20,7 +20,8 @@ const SponsoredPosts: React.FC = () => {
 
   const fetchSponsoredPosts = async () => {
     try {
-      const { data } = await axios.get<SponsoredPost[]>('http://localhost:3000/admin/sponsored-posts');
+      const { data } = await adminAxiosInstance.get<SponsoredPost[]>('sponsored-posts');
+      console.log(data)
       setPosts(data);
     } catch (error: any) {
       toast.error(error.message);
@@ -62,11 +63,11 @@ const SponsoredPosts: React.FC = () => {
 
     try {
       if (editingPost) {
-        await axios.put(`http://localhost:3000/admin/sponsored-posts/${editingPost._id}`, editingPost);
+        await adminAxiosInstance.put(`sponsored-posts/${editingPost._id}`, editingPost);
         toast.success('Sponsored post updated successfully');
         setEditingPost(null);
       } else {
-        await axios.post('http://localhost:3000/admin/sponsored-posts', newPost);
+        await adminAxiosInstance.post('sponsored-posts', newPost);
         toast.success('Sponsored post added successfully');
         setNewPost({ title: '', imageUrl: '', link: '' });
       }
@@ -87,7 +88,7 @@ const SponsoredPosts: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this sponsored post?')) {
       try {
-        await axios.delete(`http://localhost:3000/admin/sponsored-posts/${id}`);
+        await adminAxiosInstance.delete(`sponsored-posts/${id}`);
         toast.success('Sponsored post deleted successfully');
         fetchSponsoredPosts();
       } catch (error: any) {

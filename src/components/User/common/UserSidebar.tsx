@@ -18,6 +18,7 @@ import {
   FaSignOutAlt,
   FaCog,
 } from 'react-icons/fa';
+import { HiMiniRectangleGroup } from "react-icons/hi2";
 
 interface TooltipProps {
   content: string;
@@ -117,23 +118,23 @@ const Sidebar: React.FC<UserSidebarProps> = ({ iconsOnly }) => {
       <nav className="flex-1">
         <ul>
           {renderNavItem('/', <FaHome className="text-xl" />, "Home")}
-          {!isChatsPage && <li className="mb-2 px-4 text-xs font-semibold text-gray-500 uppercase">Account</li>}
+          {!isChatsPage && <li className="mb-8 px-4 text-xs font-semibold text-gray-500 uppercase">Account</li>}
           {renderNavItem(`/${user?.username}`, <FaUser className="text-xl" />, "Profile")}
           {renderNavItem('/chats', <FaComments className="text-xl" />, "Chats")}
           {renderNavItem('/friends', <FaUserFriends className="text-xl" />, "Friends")}
-          {renderNavItem('/wallet', <FaWallet className="text-xl" />, "Wallet")}
-          {!isChatsPage && <li className="mt-6 mb-2 px-4 text-xs font-semibold text-gray-500 uppercase">Main</li>}
+          {/* {renderNavItem('/wallet', <FaWallet className="text-xl" />, "Wallet")} */}
+          {!isChatsPage && <li className="mt-8 mb-8 px-4 text-xs font-semibold text-gray-500 uppercase">Main</li>}
+          {renderNavItem('/explore', <HiMiniRectangleGroup className="text-xl" />, "Explore")}
           {renderNavItem('/news', <FaNewspaper className="text-xl" />, "News")}
           {renderNavItem('/community-list', <FaUsers className="text-xl" />, "Community")}
-          {renderNavItem('/members', <FaUserFriends className="text-xl" />, "Members")}
-          {renderNavItem('/streams', <FaStream className="text-xl" />, "Streams")}
-          {!isChatsPage && <li className="mt-6 mb-2 px-4 text-xs font-semibold text-gray-500 uppercase">Support</li>}
-          {renderNavItem('/report', <FaRegFileAlt className="text-xl" />, "Report")}
-          {renderNavItem('/help', <FaQuestionCircle className="text-xl" />, "Help")}
+          {/* {renderNavItem('/members', <FaUserFriends className="text-xl" />, "Members")} */}
+          {/* {renderNavItem('/streams', <FaStream className="text-xl" />, "Streams")} */}
+          {!isChatsPage && <li className="mt-8 mb-8 px-4 text-xs font-semibold text-gray-500 uppercase">Support</li>}
+          {/* {renderNavItem('/report', <FaRegFileAlt className="text-xl" />, "Report")}
+          {renderNavItem('/help', <FaQuestionCircle className="text-xl" />, "Help")} */}
           {renderNavItem('/settings', <FaCog className="text-xl" />, "Settings")}
         </ul>
-      </nav>
-      <div className="mt-auto mb-6">
+        <div className="mt-auto mb-8">
         <button onClick={handleLogout} className={`flex items-center w-full px-4 py-2 text-gray-600 hover:text-orange-500 ${isChatsPage ? 'justify-center' : ''}`}>
           {isChatsPage ? (
             <Tooltip content="Logout">
@@ -147,6 +148,8 @@ const Sidebar: React.FC<UserSidebarProps> = ({ iconsOnly }) => {
           )}
         </button>
       </div>
+      </nav>
+
     </div>
   );
 };

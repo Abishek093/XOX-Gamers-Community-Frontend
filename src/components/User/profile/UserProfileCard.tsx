@@ -23,8 +23,8 @@ import { toast } from "sonner";
 import { useAppSelector } from "../../../store/hooks";
 import { selectUser } from "../../../Slices/userSlice/userSlice";
 import { useLoading } from "../../../context/LoadingContext";
-import axiosInstanceChat from "../../../services/userServices/axiosInstanceChat";
 import { base64ToBlob, getPresignedUrl, uploadImageToS3 } from "../../../Utils/imageUploadHelper";
+import { useNavigate } from 'react-router-dom';
 
 
 interface UserProfileCardProps {
@@ -61,6 +61,8 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
   });
   const ownUser = useAppSelector(selectUser);
   const URL = import.meta.env.VITE_CONTENT_SERVICE_API_URL
+  const navigate = useNavigate();
+
   // const handlePostCreation = async (
   //   croppedImage: string,
   //   _isProfileImage?: boolean,
@@ -95,7 +97,7 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
       if(ownUser?.id){
         const base64String = croppedImage.split(",")[1];
         const imageBlob = base64ToBlob(base64String, 'image/jpeg'); 
-        const { uploadUrl, key } = await getPresignedUrl(ownUser?.id, 'post', `content/posts`);
+        const { uploadUrl, key } = await getPresignedUrl(ownUser?.id, 'post', `content/posts/`);
         await uploadImageToS3(uploadUrl, imageBlob);
         const postImageUrl = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${key}`;
 
@@ -124,7 +126,7 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
   const handleFollow = async () => {
     try {
       const response = await axiosInstance.post(
-        `/follower/${ownUser?.id}/user/${user?.id}`
+        `user/follower/${ownUser?.id}/user/${user?.id}`
       );
       if (response.data.status === "Requested") {
         setFollowStatus("Requested");
@@ -141,7 +143,7 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
 
   const handleUnfollow = async () => {
     try {
-      await axiosInstance.delete(`/follower/${ownUser?.id}/user/${user?.id}`);
+      await axiosInstance.delete(`user/follower/${ownUser?.id}/user/${user?.id}`);
       setFollowStatus("NotFollowing");
       setFollowers(prev => Math.max(0, prev - 1));
       toast.success("Unfollowed successfully");
@@ -152,7 +154,7 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
 
   const handleCancelRequest = async () => {
     try {
-      await axiosInstance.delete(`/follower/${ownUser?.id}/user/${user?.id}`);
+      await axiosInstance.delete(`user/follower/${ownUser?.id}/user/${user?.id}`);
       setFollowStatus("NotFollowing");
       toast.success("Follow request cancelled");
     } catch (error: any) {
@@ -164,12 +166,14 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
 
   const handleSendMessage = async () => {
     try {
-      const chat = await axiosInstanceChat.get(`/check-chat/initiator/${ownUser?.id}/recipient/${user?.id}`);
+      const chat = await axiosInstance.get(`user/check-chat/initiator/${ownUser?.id}/recipient/${user?.id}`);
+      console.log('Chat: ',chat)
       if (chat.status === 204 || chat.status === 200) {
-        const newChat = await axiosInstanceChat.post(`/new-chat/initiator/${ownUser?.id}/recipient/${user?.id}`);
+        const newChat = await axiosInstance.post(`user/new-chat/initiator/${ownUser?.id}/recipient/${user?.id}`);
         if (newChat.status === 200) {
           console.log("Chat created or fetched:", newChat.data);
           toast.success("Chat opened successfully");
+          navigate('/chats'); 
         } else {
           console.log("Error creating chat:", newChat.data);
           toast.error("Error opening chat");
@@ -188,17 +192,17 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
     const fetchUserConnections = async (userId: string) => {
       try {
         const followersResult = await axiosInstance.get(
-          `/fetchFollowers/${userId}`
+          `user/fetchFollowers/${userId}`
         );
         setFollowers(followersResult.data.length);
 
         const followingResult = await axiosInstance.get(
-          `/fetchFollowing/${userId}`
+          `user/fetchFollowing/${userId}`
         );
         setFollowing(followingResult.data.length);
 
         const followStatusResult = await axiosInstance.get(
-          `/followerStatus/${ownUser?.id}/user/${userId}`
+          `user/followerStatus/${ownUser?.id}/user/${userId}`
         );
         setFollowStatus(followStatusResult.data.status);
       } catch (error) {

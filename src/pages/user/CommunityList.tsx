@@ -21,7 +21,7 @@ const CommunityList: React.FC = () => {
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
-        const { data } = await axiosInstance.get<ICommunityWithCounts[]>('fetch-all-communities');
+        const { data } = await axiosInstance.get<ICommunityWithCounts[]>('content/communities/fetch-all-communities');
         setCommunities(data);
       } catch (error: any) {
         toast.error(error.message);
@@ -39,7 +39,8 @@ const CommunityList: React.FC = () => {
     setLoading(true); 
     try {
       setIsModalOpen(false);
-      const response = await axiosInstance.post('create-community', {
+      
+      const response = await axiosInstance.post('content/communities/create-community', {
         userID,
         communityName,
         description,

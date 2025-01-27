@@ -26,9 +26,9 @@ const FriendRequest: React.FC = () => {
     const fetchFriendRequests = async () => {
       try {
         const response = await axiosInstance.get(
-          `fetch-friend-requests/${user?.id}`
+          `user/fetch-friend-requests/${user?.id}`
         );
-        console.log(response.data);
+        console.log("response.data:- ",response.data);
         setRequests(response.data);
       } catch (error: any) {
         setError(true);
@@ -39,7 +39,7 @@ const FriendRequest: React.FC = () => {
 
   const handleAccept = async (requestId: string) => {
     try {
-      await axiosInstance.post(`/accept-friend-request/${requestId}`);
+      await axiosInstance.post(`user/accept-friend-request/${requestId}`);
       setRequests((prev) =>
         prev.filter((request) => request._id !== requestId)
       );
@@ -50,7 +50,7 @@ const FriendRequest: React.FC = () => {
 
   const handleReject = async (requestId: string) => {
     try {
-      await axiosInstance.post(`/reject-friend-request/${requestId}`);
+      await axiosInstance.post(`user/reject-friend-request/${requestId}`);
       setRequests((prev) =>
         prev.filter((request) => request._id !== requestId)
       );

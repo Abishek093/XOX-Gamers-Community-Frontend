@@ -146,10 +146,10 @@ import axiosInstance from '../services/userServices/axiosInstance';
 // };
 export const getPresignedUrl = async (userId: string, fileType: string, apiUrl: string): Promise<{ uploadUrl: string, key: string }> => {
   try {
-    console.log("Frontend: Requesting pre-signed URL...", `${apiUrl}/upload-url`);
+    console.log("Frontend: Requesting pre-signed URL...", `${apiUrl}upload-url`);
     console.log("Frontend: Request payload:", { userId, fileType });
 
-    const response = await axiosInstance.post(`${apiUrl}/upload-url`, {
+    const response = await axiosInstance.post(`${apiUrl}upload-url`, {
       userId,
       fileType,
     });

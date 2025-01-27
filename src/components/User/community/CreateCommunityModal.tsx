@@ -1,6 +1,10 @@
   import React, { useState } from 'react';
   import { Button } from '@mui/material';
   import ImageUploadModal from '../../Common/ImageUploadModal';
+import { base64ToBlob, getPresignedUrl, uploadImageToS3 } from '../../../Utils/imageUploadHelper';
+import { useAppSelector } from '../../../store/hooks';
+import { selectUser } from '../../../Slices/userSlice/userSlice'
+import { toast } from 'sonner';
 
   interface CreateCommunityModalProps {
     onClose: () => void;
@@ -14,11 +18,24 @@
     const [error, setError] = useState('');
     const [isImageUploadOpen, setIsImageUploadOpen] = useState(false);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+    const ownUser = useAppSelector(selectUser);
 
-    const handleImageUpload = (croppedImage: string) => {
-      const base64String = croppedImage.split(",")[1];
-      setUploadedImage(base64String);
-      setIsImageUploadOpen(false);
+    const handleImageUpload = async(croppedImage: string) => {
+      try {
+        if(ownUser?.id){
+          const base64String = croppedImage.split(",")[1];
+          const imageBlob = base64ToBlob(base64String, 'image/jpeg'); 
+          const { uploadUrl, key } = await getPresignedUrl(ownUser?.id, 'community-profile-image', `content/posts/`);
+          await uploadImageToS3(uploadUrl, imageBlob);
+          const communityProfileImage = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${key}`
+          setUploadedImage(communityProfileImage);
+          setIsImageUploadOpen(false);
+        }else{
+          toast.error("oops try again later")
+        }
+      } catch (error: any) {
+        toast.error(error.message)
+      }
     };
 
     const handleSubmitClick = () => {
@@ -116,11 +133,12 @@
             </Button>
             {uploadedImage && (
               <div className="mt-6">
-                <img
+                {/* <img
                   src={`data:image/jpeg;base64,${uploadedImage}`}
                   alt="Uploaded Community"
                   className="w-40 h-40 object-cover rounded-lg shadow-md border-2 border-gray-300"
-                />
+                /> */}
+                <img src={uploadedImage} alt="Uploaded Community" className="w-40 h-40 object-cover rounded-lg shadow-md border-2 border-gray-300"/>
               </div>
             )}
           </div>

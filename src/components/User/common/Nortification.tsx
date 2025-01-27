@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useSocket } from '../../../services/userServices/socketProvider';
+import { useSockets } from '../../../../src/context/socketContext';
+// import { useSocket } from '../../../services/userServices/socketProvider';
 import { toast } from 'sonner'; // Import toast from sonner for notifications
 
 const NotificationPanel = () => {
-  const { followRequests } = useSocket();
+  const { followRequests } = useSockets();
   const [notifications, setNotifications] = useState<{ userId: string; followerId: string }[]>([]);
 
   useEffect(() => {

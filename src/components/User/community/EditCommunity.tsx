@@ -4,6 +4,9 @@ import { toast } from 'sonner';
 import ImageUploadModal from '../../Common/ImageUploadModal';
 import { useNavigate } from 'react-router-dom';
 import { useLoading } from '../../../context/LoadingContext';
+import { useAppSelector } from '../../../../src/store/hooks';
+import { selectUser } from '../../../../src/Slices/userSlice/userSlice';
+import { base64ToBlob, getPresignedUrl, uploadImageToS3 } from '../../../../src/Utils/imageUploadHelper';
 
 interface EditCommunityProps {
   community: {
@@ -27,11 +30,19 @@ const EditCommunity: React.FC<EditCommunityProps> = ({ community, onCommunityUpd
   const [confirmDeleteName, setConfirmDeleteName] = useState('');
   const navigate = useNavigate()
   const { setLoading } = useLoading();
+  const owner = useAppSelector(selectUser);
 
-  const handleImageUpload = (croppedImage: string) => {
-    const base64String = croppedImage.split(',')[1];
-    setUploadedImage(base64String);
-    setImageUploadModal(false);
+  const handleImageUpload = async(croppedImage: string) => {
+    if(owner?.id){
+      const base64String = croppedImage.split(',')[1];
+      const imageBlob = base64ToBlob(base64String, 'image/jpeg'); 
+      const { uploadUrl, key } = await getPresignedUrl(owner?.id, 'community-profile-Image', `content/posts`);
+      await uploadImageToS3(uploadUrl, imageBlob);
+      const postImageUrl = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${key}`;
+
+      setUploadedImage(postImageUrl);
+      setImageUploadModal(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -44,7 +55,7 @@ const EditCommunity: React.FC<EditCommunityProps> = ({ community, onCommunityUpd
       if (postPermission !== community.postPermission) updateData.postPermission = postPermission;
       if (uploadedImage !== community.image) updateData.image = uploadedImage;
       if (Object.keys(updateData).length > 0) {
-        const response = await axiosInstance.patch(`update-community/${community._id}`, updateData);
+        const response = await axiosInstance.patch(`content/communities/update-community/${community._id}`, updateData);
   
         if (response.status === 200) {
           toast.success('Community updated successfully');
@@ -72,7 +83,7 @@ const EditCommunity: React.FC<EditCommunityProps> = ({ community, onCommunityUpd
         return;
       }
 
-      const response = await axiosInstance.delete(`delete-community/${community._id}`);
+      const response = await axiosInstance.delete(`content/communities/delete-community/${community._id}`);
 
       toast.success('Community deleted successfully');
       navigate('/community-list')
@@ -160,10 +171,14 @@ const EditCommunity: React.FC<EditCommunityProps> = ({ community, onCommunityUpd
           )}
           {uploadedImage && (
             <div className="mt-6">
-              <img
+              {/* <img
                 src={`data:image/jpeg;base64,${uploadedImage}`}
                 alt="Uploaded Community"
                 className="w-40 h-40 object-cover rounded-lg shadow-md border-2 border-gray-300"
+              /> */}
+              <img src={uploadedImage}
+              alt="Uploaded Community"
+              className="w-40 h-40 object-cover rounded-lg shadow-md border-2 border-gray-300"
               />
             </div>
           )}

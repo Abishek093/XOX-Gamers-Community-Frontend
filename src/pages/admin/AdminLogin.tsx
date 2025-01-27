@@ -4,7 +4,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { loginAdmin } from '../../Slices/adminSlice/adminSlice';
-
+import { toast } from 'sonner';
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,19 +21,25 @@ const Login: React.FC = () => {
   });
 
   const handleSubmit = (values: typeof initialValues, { setSubmitting, setStatus }: any) => {
-    setStatus(null);
-    const { email, password } = values;
-    dispatch(loginAdmin({ email, password }))
-      .unwrap()
-      .then(() => {
-        setStatus({ success: true });
-      })
-      .catch((error: any) => {
-        setStatus({ success: false, error: error.message });
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+    try {
+      setStatus(null);
+      const { email, password } = values;
+      dispatch(loginAdmin({ email, password }))
+        .unwrap()
+        .then(() => {
+          setStatus({ success: true });
+        })
+        .catch((error: any) => {
+          toast.error(error.message)
+          setStatus({ success: false, error: error.message });
+        })
+        .finally(() => {
+          setSubmitting(false);
+        });
+    } catch (error) {
+      toast.error("Error in login")
+    }
+
   };
 
   return (

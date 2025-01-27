@@ -24,7 +24,7 @@ const SettingsPage: React.FC = () => {
       return;
     }
     try {
-      const response = await axiosInstance.post('/update-profile-password', {
+      const response = await axiosInstance.post('user/update-profile-password', {
         email,
         currentPassword,
         newPassword

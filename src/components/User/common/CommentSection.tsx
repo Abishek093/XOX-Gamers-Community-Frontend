@@ -31,7 +31,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments, setComments }
 
   const handleSaveEdit = async (commentId: string) => {
     try {
-      await axiosInstance.put(`update-comment/${commentId}`, { content: editContent });
+      await axiosInstance.put(`content/posts/update-comment/${commentId}`, { content: editContent });
       toast.success('Comment updated successfully');
       setIsEditing(null);
 
@@ -57,7 +57,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments, setComments }
 
   const handleDeleteConfirm = async (commentId: string) => {
     try {
-      const response = await axiosInstance.delete(`deleteComment/${commentId}`);
+      const response = await axiosInstance.delete(`content/posts/deleteComment/${commentId}`);
       if (response.status === 200) {
         toast.success('Comment deleted successfully');
         setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));

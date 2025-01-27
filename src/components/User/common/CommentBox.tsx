@@ -41,7 +41,8 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId, userId, onClose }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const comments = await axiosInstance.get(`${API_URL}fetch-comments/${postId}`);
+        const comments = await axiosInstance.get(`content/posts/fetch-comments/${postId}`);
+        console.log(comments.data)
         setComments(comments.data);
       } catch (error) {
         console.error('Error fetching comments:', error);
@@ -61,7 +62,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId, userId, onClose }) => {
   const validateAndSend = async () => {
     try {
       await commentSchema.validate({ comment: value });
-      const response = await axiosInstance.post(`${API_URL}add-comment`, {
+      const response = await axiosInstance.post(`content/posts/add-comment`, {
         postId,
         userId,
         comment: value,

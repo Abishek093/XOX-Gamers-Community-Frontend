@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
           setUser(loggedInUser);
           setOwnProfile(true);
         } else {
-          const { data } = await axiosInstance.get(`/users/${username}`);
+          const { data } = await axiosInstance.get(`user/users/${username}`);
           setUser(data);
           setOwnProfile(false);
         }

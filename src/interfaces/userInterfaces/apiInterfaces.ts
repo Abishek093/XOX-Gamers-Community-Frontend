@@ -33,6 +33,18 @@ export interface UserDetails {
   bio?: string
 }
 
+export interface CommunityData {
+  _id: string;
+  name: string;
+  description?: string;
+  createdBy: string;
+  followers: string[];
+  posts: any[]; 
+  postPermission: 'admin' | 'anyone';
+  image?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface ImageUploadValues {
   username?: string;
@@ -179,7 +191,10 @@ export interface IChatConversation {
   createdAt: string;
   updatedAt: string;
   users: IUser[];
+  lastMessage?: IMessage;
 }
+
+
 
 export interface IMedia {
   type: 'image' | 'video' | 'audio' | 'pdf' | 'gif' | 'application';
@@ -208,4 +223,9 @@ export interface IMessage {
 export interface ProfileImageProps{
   userId: string,
   profileImageUrl: string
+}
+
+export interface IMessageIdMapping {
+  tempId: string;
+  realId: string;
 }

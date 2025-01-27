@@ -1,1062 +1,2453 @@
-//App.tsx before spliting the routes
+  // useEffect(() => {
+  //   const fetchStream = async () => {
+  //     try {
+  //       setLoading(true);
+  //       setIsLoading(true);
 
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
-// import { selectUser } from './Slices/userSlice/userSlice';
-// import Signup from './pages/user/Signup';
-// import OtpPage from './pages/user/Otp';
-// import LoginPage from './pages/user/Login';
-// import Home from './pages/user/Home';
-// import AdminLogin from './pages/admin/AdminLogin'
-// import AdminDashboard from './pages/admin/AdminDashboard';
-// // import AdminNavbar from './components/Admin/AdminNavbar'
-// // import AdminSidebar from './components/Admin/AdminSidebar'
-// // import Cookies from 'js-cookie';
+  //       const response = await axiosInstance.get(`streaming/get-steam-key/${streamId}`);
 
+  //       const fetchedStreamData: StreamDto = {
+  //         ...response.data,
+  //         user: {
+  //           ...response.data.user,
+  //           profileImage: response.data.user.profileImage || '/api/placeholder/100/100'
+  //         },
+  //         status: response.data.status || {
+  //           likes: 0,
+  //           dislikes: 0,
+  //           views: 0
+  //         }
+  //       };
 
-// const PrivateRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-//   const user = useSelector(selectUser);
-//   const isAuthenticated = !!user?.user;
-//   const location = useLocation();
+  //       setStreamKey(response.data.streamKey || '');
+  //       setStreamData(fetchedStreamData);
+  //       setError(null);
 
-//   return isAuthenticated ? (
-//     <>{element}</>
-//   ) : (
-//     <Navigate to="/login" state={{ from: location }} replace />
-//   );
-// };
+  //       const commentsResponse = await axiosInstance.get(`streaming/get-stream-comments/${streamId}`);
+  //       console.log("commentsResponse.data", commentsResponse.data)
+  //       const fetchedComments: CommentType[] = commentsResponse.data
+  //         .sort((a: CommentType, b: CommentType) =>
+  //           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  //         );
 
-// const PublicRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-//   const user = useSelector(selectUser);
-//   const isAuthenticated = !!user?.user;
+  //       setComments((prevComments) => {
+  //         const commentMap = new Map(prevComments.map((c) => [c.timestamp, c]));
+  //         fetchedComments.forEach((comment) => {
+  //           if (!commentMap.has(comment.timestamp)) {
+  //             commentMap.set(comment.timestamp, comment);
+  //           }
+  //         });
 
-//   return isAuthenticated ? <Navigate to="/home" replace /> : <>{element}</>;
-// };
+  //         return Array.from(commentMap.values())
+  //           .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  //       });
+  //     } catch (error) {
+  //       console.error('Stream fetch error:', error);
+  //       setError('Failed to load stream. Please try again later.');
+  //       toast.error('Failed to show the stream');
+  //     } finally {
+  //       setLoading(false);
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-// // const PrivateAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-// //   const user = useSelector(selectUser);
-// //   const isAuthenticated = !!user?.admin;
-// //   const location = useLocation();
-
-// //   return isAuthenticated ? (
-// //     <>{element}</>
-// //   ) : (
-// //     <Navigate to="/admin/login" state={{ from: location }} replace />
-// //   );
-// // };
-
-// // const PublicAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-// //   const user = useSelector(selectUser);
-// //   const isAuthenticated = !!user?.admin;
-
-// //   return isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <>{element}</>;
-// // };
-
-// const App: React.FC = () => {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/signup" element={<PublicRoute element={<Signup />} />} />
-//         <Route path="/otp" element={<PublicRoute element={<OtpPage />} />} />
-//         <Route path="/login" element={<PublicRoute element={<LoginPage />} />} />
-//         <Route path="/home" element={<PrivateRoute element={<Home />} />} />
-//         <Route path="/admin/login" element={<AdminLogin />} />
-//         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-
-//       </Routes>
-//     </Router>
-//   );
-// };
-
-// export default App;
+  //   if (streamId) {
+  //     fetchStream();
+  //   }
+  // }, [streamId, setLoading]);
 
 
 
 
 
+  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // import React, { useEffect, useRef, useState } from "react";
+// import { Typography } from "@mui/material";
+// import GamepadIcon from "@mui/icons-material/Gamepad";
+// import { IMessage } from "../../../interfaces/userInterfaces/apiInterfaces";
+// import { format } from 'date-fns';
+// import { Avatar } from "@mui/material";
+// import { BsCheck2, BsCheck2All } from "react-icons/bs"; 
 
 
-import React from 'react';
-import { FaHome, FaUser, FaComments, FaUserFriends, FaWallet, FaNewspaper, FaUsers, FaStream, FaRegFileAlt, FaQuestionCircle } from 'react-icons/fa';
-
-const Sidebar = () => {
-  return (
-    <div className="bg-[#ffff] text-gray-900 w-64 h-screen flex flex-col p-4 drop-shadow-md sticky top-0">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-orange-500">XOX</h1>
-      </div>
-      <div className="flex-1">
-        <ul>
-          <li className="mb-10"><FaHome className="inline-block mr-2" />Home</li>
-          <li className="mb-10">ACCOUNT</li>
-          <li className="mb-6"><FaUser className="inline-block mr-2" />Profile</li>
-          <li className="mb-6"><FaComments className="inline-block mr-2" />Chats</li>
-          <li className="mb-6"><FaUserFriends className="inline-block mr-2" />Friends</li>
-          <li className="mb-10"><FaWallet className="inline-block mr-2" />Wallet</li>
-          <li className="mb-10">MAIN</li>
-          <li className="mb-6"><FaNewspaper className="inline-block mr-2" />News</li>
-          <li className="mb-6"><FaUsers className="inline-block mr-2" />Community</li>
-          <li className="mb-6"><FaUserFriends className="inline-block mr-2" />Members</li>
-          <li className="mb-10"><FaStream className="inline-block mr-2" />Streams</li>
-          <li className="mb-10">ACCOUNT</li>
-          <li className="mb-6"><FaRegFileAlt className="inline-block mr-2" />Report</li>
-          <li className="mb-6"><FaQuestionCircle className="inline-block mr-2" />Help</li>
-        </ul>
-      </div>
-    </div>
-  );
-};
-
-export default Sidebar;
-
-
-
-
-
-
-//Home page before changing to components
-
-
-
-// import React, { useEffect } from 'react';
-// import { useAppDispatch, useAppSelector } from '../../store/hooks';
-// import { useNavigate } from 'react-router-dom';
-// import { clearUser, selectUser } from '../../Slices/userSlice/userSlice';
-// import Cookies from 'js-cookie';
-
-// const Home: React.FC = () => {
-//   const dispatch = useAppDispatch();
-//   const navigate = useNavigate();
-//   const user = useAppSelector(selectUser);
-
-//   useEffect(() => {
-//     const token = Cookies.get('accessToken');
-//     if (!token && !user) {
-//       navigate('/login');
-//     }
-//   }, [navigate]);
-
-//   const handleLogout = () => {
-//     dispatch(clearUser());
-//     navigate('/login');
-//   };
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-//       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-//         <h2 className="text-2xl font-bold mb-4">Welcome, {user?.user?.username || 'User'}!</h2>
-//         <button
-//           onClick={handleLogout}
-//           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-//         >
-//           Logout
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Home;
-
-
-
-
-//otp page before setting the forget pass
-
-
-// import React, { useState, useEffect, ChangeEvent, KeyboardEvent, ClipboardEvent } from 'react';
-// import { Formik, Form, Field, ErrorMessage } from 'formik';
-// import * as Yup from 'yup';
-// import { useAppDispatch } from '../../store/hooks';
-// import { verifyOtp } from '../../Slices/userSlice/userSlice';
-// import { useNavigate, useLocation } from 'react-router-dom';
-
-// interface LocationState {
-//   email: string;
+// interface ChatBodyProps {
+//   selectedChat: any;
+//   ownUser: any;
+//   messages: IMessage[]
 // }
 
-// const OtpPage: React.FC = () => {
+// const ChatBody: React.FC<ChatBodyProps> = ({ selectedChat, ownUser, messages }) => {
 
-//   const [otp, setOtp] = useState<string[]>(new Array(4).fill(''));
+//   const messagesEndRef = useRef<HTMLDivElement>(null);
+//   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-//   const initialValues = {
-//     otp: ''
-//   };
-//   const dispatch = useAppDispatch();
-//   const navigate = useNavigate();
-//   const location = useLocation();
-//   const state = location.state as LocationState;
-//   const email = state?.email;
-
-//   const validationSchema = Yup.object({
-//     otp: Yup.string()
-//       .required('OTP is required')
-//       .length(4, 'OTP must be exactly 4 digits')
-//       .matches(/^[0-9]{4}$/, 'OTP must be exactly 4 digits')
-//   });
-
-//   const handleChange = (e: ChangeEvent<HTMLInputElement>, index: number, setFieldValue: (field: string, value: any) => void) => {
-//     const { value } = e.target;
-//     if (/^[0-9]$/.test(value)) {
-//       const newOtp = [...otp];
-//       newOtp[index] = value;
-//       setOtp(newOtp);
-//       setFieldValue('otp', newOtp.join(''));
-
-//       if (index < 3 && e.target.nextElementSibling instanceof HTMLInputElement) {
-//         e.target.nextElementSibling.focus();
-//       }
-//     }
-//   };
-
-//   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number, setFieldValue: (field: string, value: any) => void) => {
-//     if (e.key === 'Backspace' || e.key === 'Delete') {
-//       const newOtp = [...otp];
-//       newOtp[index] = '';
-//       setOtp(newOtp);
-//       setFieldValue('otp', newOtp.join(''));
-
-//       // Focus previous input box
-//       if (index > 0 && (e.target as HTMLInputElement).previousElementSibling instanceof HTMLInputElement) {
-//         ((e.target as HTMLInputElement).previousElementSibling as HTMLInputElement).focus();
-//       }
-//     }
-//   };
-
-//   const handlePaste = (e: ClipboardEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void) => {
-//     e.preventDefault();
-//     const text = e.clipboardData.getData('text');
-//     if (/^[0-9]{4}$/.test(text)) {
-//       setOtp(text.split(''));
-//       setFieldValue('otp', text);
-//     }
-//   };
 
 //   useEffect(() => {
-//     const inputs = document.querySelectorAll('#otp-form input[type="text"]') as NodeListOf<HTMLInputElement>;
-//     inputs.forEach((input) => {
-//       input.addEventListener('focus', (e) => (e.target as HTMLInputElement).select());
-//     });
-//   }, []);
-
-//   const handleSubmit = async (otp: string) => {
-//     try {
-//       const response = await dispatch(verifyOtp({ email, otp })).unwrap();
-//       console.log(response);
-//       navigate('/login'); 
-//     } catch (error: any) {
-//       console.error(error.message);
+//     if (!isLoading) {
+//       scrollToBottom();
 //     }
+//   }, [messages, isLoading]);
+//   const scrollToBottom = () => {
+//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 //   };
 
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gray-100" style={{ backgroundImage: "url('https://pro-theme.com/html/teamhost/assets/img/heading8.jpg')" }}>
-//       {/* <main className="relative min-h-screen flex flex-col justify-center bg-slate-50 overflow-hidden"> */}
-//         <div className="w-full max-w-6xl mx-auto px-4 md:px-6 py-24">
-//           <div className="flex justify-center">
-//             <div className="w-5/6 text-center bg-white px-4 sm:px-8 py-10 rounded-xl shadow">
-//               <header className="mb-8">
-//                 <h1 className="text-2xl font-bold mb-1">Email Verification</h1>
-//                 <p className="text-[15px] text-slate-500">
-//                   Enter the 4-digit verification code that was sent to your email.
-//                 </p>
-//               </header>
-//               <Formik
-//                 initialValues={initialValues}
-//                 validationSchema={validationSchema}
-//                 onSubmit={(values) => {
-//                   handleSubmit(values.otp)
-//                 }}
-//               >
-//                 {({ isSubmitting, setFieldValue }) => (
-//                   <Form id="otp-form">
-//                     <div className="flex items-center justify-center gap-7">
-//                       {otp.map((data, index) => (
-//                         <Field
-//                           key={index}
-//                           type="text"
-//                           name={`otp[${index}]`}
-//                           className="w-14 h-14 text-center text-2xl font-extrabold text-slate-900 bg-slate-100 border border-transparent hover:border-slate-200 appearance-none rounded p-4 outline-none focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-//                           maxLength={1}
-//                           value={data}
-//                           onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, index, setFieldValue)}
-//                           onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index, setFieldValue)}
-//                           onPaste={(e: ClipboardEvent<HTMLInputElement>) => handlePaste(e, setFieldValue)}
-//                         />
-//                       ))}
-//                     </div>
-//                     <ErrorMessage name="otp" component="div" className="text-red-500 text-sm mt-2" />
-//                     <div className="max-w-[260px] mx-auto mt-4">
-//                       <button
-//                         type="submit"
-//                         className="w-full inline-flex justify-center whitespace-nowrap rounded-lg bg-indigo-500 px-3.5 py-2.5 text-sm font-medium text-white shadow-sm shadow-indigo-950/10 hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 transition-colors duration-150"
-//                         disabled={isSubmitting}
-//                       >
-//                         Verify Account
-//                       </button>
-//                     </div>
-//                   </Form>
-//                 )}
-//               </Formik>
-//               <div className="text-sm text-slate-500 mt-4">
-//                 Didn't receive code?{' '}
-//                 <a className="font-medium text-indigo-500 hover:text-indigo-600" href="#0">
-//                   Resend
-//                 </a>
-//               </div>
+//   if (!selectedChat) {
+//     return (
+//       <div className="flex-1 flex flex-col items-center justify-center bg-gray-900 text-white">
+//         <div className="w-64 h-64 bg-gray-800 rounded-lg shadow-lg p-4 mb-8 relative overflow-hidden">
+//           <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 opacity-20"></div>
+//           <div className="relative z-10 h-full flex flex-col items-center justify-center">
+//             <GamepadIcon style={{ fontSize: 64, marginBottom: 16 }} />
+//             <Typography variant="h5" className="text-center mb-4 font-pixel">
+//               Gamer Chat
+//             </Typography>
+//             <Typography variant="body2" className="text-center mb-4 font-pixel">
+//               Select chat to start Conversation!
+//             </Typography>
+//             <div className="flex space-x-2">
+//               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+//               <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse delay-75"></div>
+//               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse delay-150"></div>
 //             </div>
 //           </div>
 //         </div>
-//       {/* </main> */}
-//      </div>
-//   );
-// };
+//       </div>
+//     );
+//   }
 
+//   // Check if messages exist in the selectedChat object
+//   // if (!selectedChat.messages || selectedChat.messages.length === 0) {
+//   //   return (
+//   //     <div className="flex-grow flex items-center justify-center">
+//   //       <Typography variant="h6" color="textSecondary">
+//   //         No messages yet.
+//   //       </Typography>
+//   //     </div>
+//   //   );
+//   // }
 
+//   const renderMessage = (msg: IMessage, isOwnMessage: boolean) => {
+//     const messageTime = msg.createdAt ? format(new Date(msg.createdAt), 'HH:mm') : 'Unknown Time';
 
-
-
-//UserRoute
-
-// import React from 'react';
-// import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
-// import { selectUser } from '../../Slices/userSlice/userSlice';
-// import Signup from '../../pages/user/Signup';
-// import OtpPage from '../../pages/user/Otp';
-// import LoginPage from '../../pages/user/Login';
-// import Home from '../../pages/user/Home';
-// import Profile from '../../pages/user/Profile';
-// import ConfirmMail from '../../pages/user/ConfirmMail';
-// import ConfirmPassword from '../../pages/user/ConfirmPassword';
-
-// const PrivateRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-//   const user = useSelector(selectUser);
-//   const isAuthenticated = !!user?.user;
-//   const location = useLocation();
-
-//   return isAuthenticated ? (
-//     <>{element}</>
-//   ) : (
-//     <Navigate to="/login" state={{ from: location }} replace />
-//   );
-// };
-
-// const PublicRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-//   const user = useSelector(selectUser);
-//   const isAuthenticated = !!user?.user;
-
-//   return isAuthenticated ? <Navigate to="/home" replace /> : <>{element}</>;
-// };
-
-// const UserRoutes: React.FC = () => {
-//   return (
-//     <Routes>
-//       <Route path="/signup" element={<PublicRoute element={<Signup />} />} />
-//       <Route path="/otp" element={<PublicRoute element={<OtpPage />} />} />
-//       <Route path="/login" element={<PublicRoute element={<LoginPage />} />} />
-//       <Route path="/home" element={<PrivateRoute element={<Home />} />} />
-//       <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
-//       <Route path="/confirm-mail" element={<PublicRoute element={<ConfirmMail />}/>} />
-//       <Route path="/reset-password" element={<PublicRoute element={<ConfirmPassword />}/>} />
-//     </Routes>
-//   );
-// };
-
-// export default UserRoutes;
-
-
-
-
-
-
-
-
-//AdminRoutes
-
-// import React from 'react';
-// import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
-// import { selectUser } from '../../Slices/userSlice/userSlice';
-// import AdminLogin from '../../pages/admin/AdminLogin';
-// import AdminDashboard from '../../pages/admin/AdminDashboard';
-
-// // const PrivateAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-// //   const user = useSelector(selectUser);
-// //   const isAuthenticated = !!user?.admin;
-// //   const location = useLocation();
-
-// //   return isAuthenticated ? (
-// //     <>{element}</>
-// //   ) : (
-// //     <Navigate to="/admin/login" state={{ from: location }} replace />
-// //   );
-// // };
-
-// // const PublicAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-// //   const user = useSelector(selectUser);
-// //   const isAuthenticated = !!user?.admin;
-
-// //   return isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <>{element}</>;
-// // };
-
-// const AdminRoutes: React.FC = () => {
-//   return (
-//     <Routes>
-//       <Route path="/admin/login" element={<AdminLogin />} />
-//       <Route path="/admin/dashboard" element={<AdminDashboard />} />
-//     </Routes>
-//   );
-// };
-
-// export default AdminRoutes;
-// import React from 'react';
-// import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
-// import { selectUser } from '../../Slices/userSlice/userSlice';
-// import AdminLogin from '../../pages/admin/AdminLogin';
-// import AdminDashboard from '../../pages/admin/AdminDashboard';
-
-// const PrivateAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-//   const user = useSelector(selectUser);
-//   const isAuthenticated = !!user?.admin;
-//   const location = useLocation();
-
-//   return isAuthenticated ? (
-//     <>{element}</>
-//   ) : (
-//     <Navigate to="/admin/login" state={{ from: location }} replace />
-//   );
-// };
-
-// const PublicAdminRoute: React.FC<{ element: React.ReactNode }> = ({ element }) => {
-//   const user = useSelector(selectUser);
-//   const isAuthenticated = !!user?.admin;
-
-//   return isAuthenticated ? <Navigate to="/admin/dashboard" replace /> : <>{element}</>;
-// };
-
-// const AdminRoutes: React.FC = () => {
-//   return (
-//     <Routes>
-//       <Route path="/admin/login" element={<AdminLogin />} />
-//       <Route path="/admin/dashboard" element={<PrivateAdminRoute element={<AdminDashboard />} />} />
-//     </Routes>
-//   );
-// };
-
-// export default AdminRoutes;
-
-
-
-
-///UserTitleCard
-
-// import React, { useState } from "react";
-// import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-// import {
-//   UserDetails,
-//   GoogleUser,
-//   UserData,
-//   ImageUploadValues,
-// } from "../../../interfaces/userInterfaces/apiInterfaces";
-// import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-// import { selectUser, updateProfieImage, updateTitleImage } from "../../../Slices/userSlice/userSlice";
-// import ImageUploadModal from "../../Common/ImageUploadModal";
-// import { toast } from "sonner";
-// import { useNavigate } from "react-router-dom";
-
-// interface UserTitleCardProps {
-//   user: UserData | GoogleUser | UserDetails | null;
-//   activeTab: "posts" | "info" | "friends" | "groups";
-// }
-
-// const UserTitleCard: React.FC<UserTitleCardProps> = ({ user, activeTab }) => {
-//   const defaultProfileImage =
-//     "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1719396828~exp=1719400428~hmac=3992078a184c24bf98ee7b06afbab8f3bad2a1d00f616f2b7a906e219f974cb1&w=740";
-//   const defaultTitleImage =
-//     "https://pro-theme.com/html/teamhost/assets/img/heading3.jpg";
-
-//   const ownUser = useAppSelector(selectUser);
-//   const dispatch = useAppDispatch();
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const [isProfileImage, setIsProfileImage] = useState(true);
-//   const navigate = useNavigate();
-
-//   const getCachedImageUrl = (imageUrl?: string) => {
-//     return imageUrl ? `${imageUrl}?t=${new Date().getTime()}` : defaultProfileImage;
-//   };
-
-//   const handleImageUpload = async (croppedImage: string, isProfileImage: boolean) => {
-//     try {
-//       const base64String = croppedImage.split(',')[1];
-//       const values: ImageUploadValues = {
-//         userId: ownUser?.id || '',
-//         username: ownUser?.username || '',
-//         profileImage: isProfileImage ? base64String : '',
-//         titleImage: !isProfileImage ? base64String : ''
-//       };
-
-//       let response;
-//       if (isProfileImage) {
-//         response = await dispatch(updateProfieImage(values));
-//       } else {
-//         response = await dispatch(updateTitleImage(values));
-//       }
-
-//       if (updateProfieImage.fulfilled.match(response) || updateTitleImage.fulfilled.match(response)) {
-//         toast.success(isProfileImage ? "Profile image uploaded successfully." : "Title image uploaded successfully.");
-//       } else {
-//         toast.error("Image upload failed.");
-//       }
-//     } catch (error: any) {
-//       toast.error("Image upload failed.");
-//     }
-//   };
-
-//   return (
-//     <>
-//       <div className="h-64 bg-gray-800 p-4 flex flex-col justify-center items-center relative">
-//         <img
-//           src={getCachedImageUrl(user?.titleImage) || defaultTitleImage}
-//           alt="Title"
-//           className="object-cover w-full h-full absolute top-0 left-0 z-0"
-//         />
-//         {activeTab === "info" && (
-//           <button
-//             className="absolute bottom-1 right-1 w-10 h-10 bg-white rounded text-gray-600 hover:text-gray-900"
-//             onClick={() => {
-//               setIsModalOpen(true);
-//               setIsProfileImage(false);
-//             }}
+//     return (
+//       <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-2`}>
+//         {!isOwnMessage && (
+//           <Avatar
+//             src={msg.sender.profileImage}
+//             style={{ backgroundColor: "#FB923C", color: "white" }}
+//             className="mr-2"
 //           >
-//             <AddPhotoAlternateIcon />
-//           </button>
+//             {msg.sender.displayName?.[0] || '?'}
+//           </Avatar>
 //         )}
-//         <div className="flex flex-col items-center">
-//           <div className="w-[120px] h-[120px] rounded-full bg-white mb-2 relative overflow-hidden">
-//             <img
-//               src={getCachedImageUrl(user?.profileImage) || defaultProfileImage}
-//               className="object-cover w-full h-full"
-//               alt="Profile"
-//             />
-//             {activeTab === "info" && (
-//               <button
-//                 className="absolute bottom-0 left-0 w-32 h-10 bg-slate-300 shadow-lg text-gray-600 items-center justify-center hover:text-gray-900"
-//                 onClick={() => {
-//                   setIsModalOpen(true);
-//                   setIsProfileImage(true);
-//                 }}
-//               >
-//                 <AddPhotoAlternateIcon />
-//               </button>
+//         <div className={`rounded-lg p-3 max-w-xs ${isOwnMessage ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'}`}>
+//           {msg.content && <Typography>{msg.content}</Typography>}
+//           {msg.media && msg.media.map((media, index) => (
+//             <div key={index} className="mt-2">
+//               {media.type === 'image' && (
+//                 <img src={media.url} alt="Shared image" className="max-w-full h-auto rounded" />
+//               )}
+//               {media.type === 'video' && (
+//                 <video src={media.url} controls className="max-w-full h-auto rounded" />
+//               )}
+//               {media.type === 'audio' && (
+//                 <audio src={media.url} controls className="max-w-full" />
+//               )}
+//               {media.type === 'application' && (
+//                 <a href={media.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+//                   View Document
+//                 </a>
+//               )}
+//             </div>
+//           ))}
+//           <div className="text-xs mt-1 text-gray-500 flex justify-end items-center">
+//             <span>{messageTime}</span>
+//             {isOwnMessage && (
+//               <span className="ml-1">
+//                 {msg.seen ? (
+//                   <BsCheck2All className="text-white" /> // Double tick when seen
+//                 ) : (
+//                   <BsCheck2 className="text-white" /> // Single tick when not seen
+//                 )}
+//               </span>
 //             )}
 //           </div>
-//           <h1 className="uk-page-heading-style-a uk-page-heading-h text-white text-xl font-bold z-10">
-//             {user?.username || "User"}
-//           </h1>
-//           <p className="text-white text-base z-10">{user?.bio || ""}</p>
 //         </div>
+//         {isOwnMessage && (
+//           <Avatar
+//             src={ownUser?.profileImage}
+//             style={{ backgroundColor: "#FB923C", color: "white" }}
+//             className="ml-2"
+//           >
+//             {ownUser?.username?.[0] || '?'}
+//           </Avatar>
+//         )}
 //       </div>
-//       <ImageUploadModal
-//         isOpen={isModalOpen}
-//         profile={isProfileImage}
-//         onClose={() => setIsModalOpen(false)}
-//         onSubmit={handleImageUpload}
-//       />
-//     </>
+//     );
+//   };
+//   return (
+//     <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+//       {isLoading ? (
+//         <div className="flex justify-center items-center h-full">
+//           <Typography>Loading messages...</Typography>
+//         </div>
+//       ) : (
+//         messages.map((msg, index) => {
+//           const isOwnMessage = msg.sender._id === ownUser?.id;
+//           return (
+//             <div key={index}>
+//               {renderMessage(msg, isOwnMessage)}
+//             </div>
+//           );
+//         })
+//       )}
+//       <div ref={messagesEndRef} />
+//     </div>
 //   );
 // };
 
-// export default UserTitleCard;
-_______________________________________________
-// import React, { useState, useCallback, useRef } from 'react';
-// import CloseIcon from '@mui/icons-material/Close';
-// import Cropper, { Area } from 'react-easy-crop';
-// import { getCroppedImg } from './canvasUtils';
-// import imageCompression from 'browser-image-compression';
+// export default ChatBody;
 
 
-// interface ImageUploadModalProps {
-//   isOpen: boolean;
-//   profile: boolean;
-//   onClose: () => void;
-//   onSubmit: (croppedImage: string, isProfileImage: boolean) => void;
+
+// import React, { useEffect, useRef, useState } from "react";
+// import { Typography } from "@mui/material";
+// import GamepadIcon from "@mui/icons-material/Gamepad";
+// import { IMessage } from "../../../interfaces/userInterfaces/apiInterfaces";
+// import { format, isSameDay, subDays } from 'date-fns';
+// import { Avatar } from "@mui/material";
+// import { BsCheck2, BsCheck2All } from "react-icons/bs"; 
+
+
+// interface ChatBodyProps {
+//   selectedChat: any;
+//   ownUser: any;
+//   messages: IMessage[]
 // }
 
-// const ImageUploadModal: React.FC<ImageUploadModalProps> = ({ isOpen, profile, onClose, onSubmit }) => {
-//   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-//   const [zoom, setZoom] = useState<number>(1);
-//   const [imageSrc, setImageSrc] = useState<string | null>(null);
-//   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-//   const [isDragging, setIsDragging] = useState<boolean>(false);
+// const ChatBody: React.FC<ChatBodyProps> = ({ selectedChat, ownUser, messages }) => {
 
-//   const dropRef = useRef<HTMLDivElement>(null);
+//   const messagesEndRef = useRef<HTMLDivElement>(null);
+//   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-//   const handleDragEnter = (e: React.DragEvent) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     setIsDragging(true);
+//   useEffect(() => {
+//     if (!isLoading) {
+//       scrollToBottom();
+//     }
+//   }, [messages, isLoading]);
+
+//   const scrollToBottom = () => {
+//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 //   };
 
-//   const handleDragLeave = (e: React.DragEvent) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     setIsDragging(false);
-//   };
-
-//   const handleDragOver = (e: React.DragEvent) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-//   };
-
-//   const handleDrop = (e: React.DragEvent) => {
-//     e.preventDefault();
-//     e.stopPropagation();
-//     setIsDragging(false);
-  
-//     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-//       const file = e.dataTransfer.files[0];
-//       handleFile(file);
+//   const getDateLabel = (date: Date) => {
+//     const today = new Date();
+//     if (isSameDay(date, today)) {
+//       return "Today";
+//     } else if (isSameDay(date, subDays(today, 1))) {
+//       return "Yesterday";
+//     } else {
+//       return format(date, 'MMMM dd, yyyy');
 //     }
 //   };
 
-//   const handleFile = async (file: File) => {
-//     try {
-//       const options = {
-//         maxSizeMB: 1, 
-//         maxWidthOrHeight: 1920, 
-//         useWebWorker: true,
-//       };
-  
-//       const compressedFile = await imageCompression(file, options);
-//       const reader = new FileReader();
-//       reader.onload = () => setImageSrc(reader.result as string);
-//       reader.readAsDataURL(compressedFile);
-//     } catch (error) {
-//       console.error('Error compressing image:', error);
+//   // Group messages by date
+//   const groupedMessages = messages.reduce((acc, message) => {
+//     // Ensure message.createdAt is defined
+//     const messageDate = message.createdAt ? new Date(message.createdAt) : new Date();
+//     const dateKey = format(messageDate, 'yyyy-MM-dd');
+
+//     if (!acc[dateKey]) {
+//       acc[dateKey] = [];
 //     }
-//   };
+//     acc[dateKey].push(message);
+//     return acc;
+//   }, {} as Record<string, IMessage[]>);
 
-//   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
-//     setCroppedAreaPixels(croppedAreaPixels);
-//   }, []);
+//   const renderMessage = (msg: IMessage, isOwnMessage: boolean) => {
+//     const messageTime = msg.createdAt ? format(new Date(msg.createdAt), 'HH:mm') : 'Unknown Time';
 
-//   const handleCrop = useCallback(async () => {
-//     if (imageSrc && croppedAreaPixels) {
-//       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-//       console.log('Cropped Image:', croppedImage);
-  
-//       if (croppedImage) {
-//         const base64String = await convertToBase64(croppedImage);
-//         onSubmit(base64String, profile);
-//         setImageSrc(null)
-//         onClose()
-//       } else {
-//         console.error('Cropped image is undefined');
-//       }
-//     }
-//   }, [imageSrc, croppedAreaPixels, onSubmit]);
-  
-//   const convertToBase64 = (blobUrl: string): Promise<string> => {
-//     return new Promise((resolve, reject) => {
-//       fetch(blobUrl)
-//         .then(response => response.blob())
-//         .then(blob => {
-//           const reader = new FileReader();
-//           reader.onloadend = () => {
-//             resolve(reader.result as string);
-//           };
-//           reader.onerror = reject;
-//           reader.readAsDataURL(blob);
-//         })
-//         .catch(reject);
-//     });
-//   };
-  
-//   return isOpen ? (
-//     <div
-//       ref={dropRef}
-//       className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ${isDragging ? 'border-4 border-blue-500' : ''}`}
-//       onDragEnter={handleDragEnter}
-//       onDragLeave={handleDragLeave}
-//       onDragOver={handleDragOver}
-//       onDrop={handleDrop}
-//     >
-//       <div className="relative w-1/2 h-3/4 bg-white rounded-lg" onClick={(e) => e.stopPropagation()}>
-//         <button className="absolute top-4 right-4 text-white z-10" onClick={()=>setImageSrc(null)}>
-//           <CloseIcon />
-//         </button>
-
-//         {imageSrc ? (
-//           <div className="">
-//             <Cropper
-//               image={imageSrc}
-//               crop={crop}
-//               zoom={zoom}
-//               cropShape={profile ? "round" : "rect"}
-//               aspect={profile ? 1 / 1 : 16 / 9}
-//               onCropChange={setCrop}
-//               onCropComplete={onCropComplete}
-//               onZoomChange={setZoom}
-//             />
-//             <button
-//               onClick={handleCrop}
-//               className="absolute bottom-4 left-1/2  bg-white text-black font-sans font-semibold py-2 px-4 rounded"
-//             >
-//               Save
-//             </button>
+//     return (
+//       <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-2`}>
+//         {!isOwnMessage && (
+//           <Avatar
+//             src={msg.sender.profileImage}
+//             style={{ backgroundColor: "#FB923C", color: "white" }}
+//             className="mr-2"
+//           >
+//             {msg.sender.displayName?.[0] || '?'}
+//           </Avatar>
+//         )}
+//         <div className={`rounded-lg p-3 max-w-xs ${isOwnMessage ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'}`}>
+//           {msg.content && <Typography>{msg.content}</Typography>}
+//           {msg.media && msg.media.map((media, index) => (
+//             <div key={index} className="mt-2">
+//               {media.type === 'image' && (
+//                 <img src={media.url} alt="Shared image" className="max-w-full h-auto rounded" />
+//               )}
+//               {media.type === 'video' && (
+//                 <video src={media.url} controls className="max-w-full h-auto rounded" />
+//               )}
+//               {media.type === 'audio' && (
+//                 <audio src={media.url} controls className="max-w-full" />
+//               )}
+//               {media.type === 'application' && (
+//                 <a href={media.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+//                   View Document
+//                 </a>
+//               )}
+//             </div>
+//           ))}
+//           <div className="text-xs mt-1 text-gray-500 flex justify-end items-center">
+//             <span>{messageTime}</span>
+//             {isOwnMessage && (
+//               <span className="ml-1">
+//                 {msg.seen ? (
+//                   <BsCheck2All className="text-white" /> // Double tick when seen
+//                 ) : (
+//                   <BsCheck2 className="text-white" /> // Single tick when not seen
+//                 )}
+//               </span>
+//             )}
 //           </div>
-//         ) : (
-//           <div className="flex flex-col items-center justify-center w-full h-full relative">
-//             <img src="/src/assets/images_Logo.png" className="w-28 h-28 mb-5" />
-//             <p>Drag and drop an image here</p>
-//             <p className="font-semibold">Click to select one.</p>
-//             <input
-//               type="file"
-//               accept=".jpg,.jpeg,.png,.gif"
-//               onChange={(e) => {
-//                 const file = e.target.files?.[0];
-//                 if (file) {
-//                   const reader = new FileReader();
-//                   reader.onload = () => setImageSrc(reader.result as string);
-//                   reader.readAsDataURL(file);
-//                 }
-//               }}
-//               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-//             />
-//             <button className="absolute top-4 right-4 text-gray-600 z-10" onClick={onClose}>
-//               <CloseIcon />
-//             </button>
-//           </div>
+//         </div>
+//         {isOwnMessage && (
+//           <Avatar
+//             src={ownUser?.profileImage}
+//             style={{ backgroundColor: "#FB923C", color: "white" }}
+//             className="ml-2"
+//           >
+//             {ownUser?.username?.[0] || '?'}
+//           </Avatar>
 //         )}
 //       </div>
+//     );
+//   };
+
+//   return (
+//     <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+//       {isLoading ? (
+//         <div className="flex justify-center items-center h-full">
+//           <Typography>Loading messages...</Typography>
+//         </div>
+//       ) : (
+//         Object.keys(groupedMessages).map((dateKey) => {
+//           const date = new Date(dateKey); // Convert string dateKey back to Date
+//           const dateLabel = getDateLabel(date);
+
+//           return (
+//             <div key={dateKey}>
+//               {/* Render date label */}
+//               <div className="text-center text-gray-500 my-2">
+//                 <Typography variant="body2">{dateLabel}</Typography>
+//               </div>
+
+//               {/* Render messages for that date */}
+//               {groupedMessages[dateKey].map((msg, index) => {
+//                 const isOwnMessage = msg.sender._id === ownUser?.id;
+//                 return (
+//                   <div key={index}>
+//                     {renderMessage(msg, isOwnMessage)}
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           );
+//         })
+//       )}
+//       <div ref={messagesEndRef} />
 //     </div>
-//   ) : null;
+//   );
 // };
 
-// export default ImageUploadModal;
+// export default ChatBody;
 
 
 
 
 
-////////////////////////////////////////////////////////////////////
 
-// import React, { useEffect, useState } from 'react';
-// import UserTitleCard from '../../components/User/profile/UserTitleCard';
-// import UserProfileCard from '../../components/User/profile/UserProfileCard';
-// import PostFeed from '../../components/User/common/PostFeed';
-// import ProfileTabs from '../../components/User/profile/ProfileTabs';
-// // import FriendsCard from '../../components/User/profile/FriendsCard';
-// import InfoComponent from '../../components/User/profile/InfoComponent';
-// import { useNavigate, useParams } from 'react-router-dom';
-// import { useAppSelector } from '../../store/hooks';
-// import { selectUser } from '../../Slices/userSlice/userSlice';
-// import { GoogleUser, UserData, UserDetails } from '../../interfaces/userInterfaces/apiInterfaces';
-// import axiosInstance from '../../services/userServices/axiosInstance';
-
-// type Tab = 'posts' | 'info' | 'friends' | 'groups';
-
-// const Profile: React.FC = () => {
-//   const [activeTab, setActiveTab] = useState<Tab>('posts');
-//   const [user, setUser] = useState<UserData | GoogleUser | UserDetails | null>(null);
-//   const [ownProfile, setOwnProfile] = useState<boolean>(false);
-//   const { username } = useParams<{ username: string }>();
-//   const loggedInUser = useAppSelector(selectUser);
-//   const navigate = useNavigate()
+// import React, { useEffect, useRef, useState } from "react";
+// import { Typography } from "@mui/material";
+// import GamepadIcon from "@mui/icons-material/Gamepad";
+// import { IMessage } from "../../../interfaces/userInterfaces/apiInterfaces";
+// import { format, isSameDay, subDays } from 'date-fns';
+// import { Avatar } from "@mui/material";
+// import { BsCheck2, BsCheck2All } from "react-icons/bs";
+// import MoreVertIcon from '@mui/icons-material/MoreVert';
+// import DeleteIcon from '@mui/icons-material/Delete';
+// import ConfirmationModal from './ConfirmationModal'; // We'll create this component
+// import { useSocket } from '../../../services/userServices/socketProvider';
 
 
-//   const handleProfileUpdate = (username: string) => {
-//     setOwnProfile(true);
-//     navigate(`/${username}`);
+// interface ChatBodyProps {
+//   selectedChat: any;
+//   ownUser: any;
+//   messages: IMessage[];
+// }
+
+// const ChatBody: React.FC<ChatBodyProps> = ({ selectedChat, ownUser, messages }) => {
+//   const messagesEndRef = useRef<HTMLDivElement>(null);
+//   const [isLoading, setIsLoading] = useState<boolean>(false);
+//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+//   const [selectedMessage, setSelectedMessage] = useState<IMessage | null>(null);
+//   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+//   const { socket } = useSocket();
+
+
+//   useEffect(() => {
+//     if (!isLoading) {
+//       scrollToBottom();
+//     }
+//   }, [messages, isLoading]);
+
+//   const scrollToBottom = () => {
+//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+//   };
+
+//   const getDateLabel = (date: Date) => {
+//     const today = new Date();
+//     if (isSameDay(date, today)) {
+//       return "Today";
+//     } else if (isSameDay(date, subDays(today, 1))) {
+//       return "Yesterday";
+//     } else {
+//       return format(date, 'MMMM dd, yyyy');
+//     }
+//   };
+
+//   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, message: IMessage) => {
+//     setAnchorEl(event.currentTarget);
+//     setSelectedMessage(message);
+//   };
+
+//   const handleMenuClose = () => {
+//     setAnchorEl(null);
+//   };
+
+//   const handleDeleteClick = () => {
+//     handleMenuClose();
+//     setIsDeleteModalOpen(true);
+//   };
+
+//   const handleDeleteConfirm = () => {
+//     if (selectedMessage && socket) {
+//       socket.emit('deleteMessage', { messageId: selectedMessage._id, chatId: selectedChat._id });
+//     }
+//     setIsDeleteModalOpen(false);
+//   };
+
+//   // Group messages by date
+//   const groupedMessages = messages.reduce((acc, message) => {
+//     const messageDate = message.createdAt ? new Date(message.createdAt) : new Date();
+//     const dateKey = format(messageDate, 'yyyy-MM-dd');
+//     if (!acc[dateKey]) {
+//       acc[dateKey] = [];
+//     }
+//     acc[dateKey].push(message);
+//     return acc;
+//   }, {} as Record<string, IMessage[]>);
+
+//   const renderMessage = (msg: IMessage, isOwnMessage: boolean) => {
+//     const messageTime = msg.createdAt ? format(new Date(msg.createdAt), 'HH:mm') : 'Unknown Time';
+
+//     return (
+//       <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-2`}>
+//         {!isOwnMessage && (
+//           <Avatar
+//             src={msg.sender.profileImage}
+//             style={{ backgroundColor: "#FB923C", color: "white" }}
+//             className="mr-2"
+//           >
+//             {msg.sender.displayName?.[0] || '?'}
+//           </Avatar>
+//         )}
+//         <div className={`rounded-lg p-3 max-w-xs ${isOwnMessage ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'}`}>
+//           {msg.content && <Typography>{msg.content}</Typography>}
+//           {msg.media && msg.media.map((media, index) => (
+//             <div key={index} className="mt-2">
+//               {media.type === 'image' && (
+//                 <img src={media.url} alt="Shared image" className="max-w-full h-auto rounded" />
+//               )}
+//               {media.type === 'video' && (
+//                 <video src={media.url} controls className="max-w-full h-auto rounded" />
+//               )}
+//               {media.type === 'audio' && (
+//                 <audio src={media.url} controls className="max-w-full" />
+//               )}
+//               {media.type === 'application' && (
+//                 <a href={media.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+//                   View Document
+//                 </a>
+//               )}
+//             </div>
+//           ))}
+//           <div className="text-xs mt-1 text-gray-500 flex justify-end items-center">
+//             <span>{messageTime}</span>
+//             {isOwnMessage && (
+//               <span className="ml-1">
+//                 {msg.seen ? (
+//                   <BsCheck2All className="text-white" /> // Double tick when seen
+//                 ) : (
+//                   <BsCheck2 className="text-white" /> // Single tick when not seen
+//                 )}
+//               </span>
+//             )}
+//           </div>
+//         </div>
+//         {isOwnMessage && (
+//           <Avatar
+//             src={ownUser?.profileImage}
+//             style={{ backgroundColor: "#FB923C", color: "white" }}
+//             className="ml-2"
+//           >
+//             {ownUser?.username?.[0] || '?'}
+//           </Avatar>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   // Render default page when no chat is selected
+//   if (!selectedChat) {
+//     return (
+//       <div className="flex-1 flex flex-col items-center justify-center bg-gray-900 text-white">
+//         <div className="w-64 h-64 bg-gray-800 rounded-lg shadow-lg p-4 mb-8 relative overflow-hidden">
+//           <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 opacity-20"></div>
+//           <div className="relative z-10 h-full flex flex-col items-center justify-center">
+//             <GamepadIcon style={{ fontSize: 64, marginBottom: 16 }} />
+//             <Typography variant="h5" className="text-center mb-4 font-pixel">
+//               Gamer Chat
+//             </Typography>
+//             <Typography variant="body2" className="text-center mb-4 font-pixel">
+//               Select a chat to start a conversation!
+//             </Typography>
+//             <div className="flex space-x-2">
+//               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+//               <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse delay-75"></div>
+//               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse delay-150"></div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // Render chat messages if selectedChat exists
+//   return (
+//     <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+//       {isLoading ? (
+//         <div className="flex justify-center items-center h-full">
+//           <Typography>Loading messages...</Typography>
+//         </div>
+//       ) : (
+//         Object.keys(groupedMessages).map((dateKey) => {
+//           const date = new Date(dateKey); // Convert string dateKey back to Date
+//           const dateLabel = getDateLabel(date);
+
+//           return (
+//             <div key={dateKey}>
+//               {/* Render date label */}
+//               <div className="text-center text-gray-500 my-2">
+//                 <Typography variant="body2">{dateLabel}</Typography>
+//               </div>
+
+//               {/* Render messages for that date */}
+//               {groupedMessages[dateKey].map((msg, index) => {
+//                 const isOwnMessage = msg.sender._id === ownUser?.id;
+//                 return (
+//                   <div key={index}>
+//                     {renderMessage(msg, isOwnMessage)}
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           );
+//         })
+//       )}
+//       <div ref={messagesEndRef} />
+//     </div>
+//   );
+// };
+
+// export default ChatBody;
+
+
+
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+// import React, { useEffect, useRef, useState } from "react";
+// import { Typography, IconButton, Menu, MenuItem, Avatar, Fade } from "@mui/material";
+// import GamepadIcon from "@mui/icons-material/Gamepad";
+// import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+// import DeleteIcon from '@mui/icons-material/Delete';
+// import ConfirmationModal from './ConfirmationModal';
+// // import { useSocket } from '../../../services/userServices/socketProvider';
+// import { BsCheck2, BsCheck2All } from "react-icons/bs";
+// import { IMessage } from "../../../interfaces/userInterfaces/apiInterfaces";
+// import { format, isSameDay, subDays } from 'date-fns';
+// import { CiMenuKebab } from "react-icons/ci";
+// import { useSockets } from "../../../context/socketContext";
+
+// interface ChatBodyProps {
+//   selectedChat: any;
+//   ownUser: any;
+//   messages: IMessage[];
+// }
+
+// interface MessageSeenPayload {
+//   userID: string;
+//   chatID: string;
+//   messageIds: string[];
+// }
+
+// const ChatBody: React.FC<ChatBodyProps> = ({ selectedChat, ownUser, messages }) => {
+//   // const messagesEndRef = useRef<HTMLDivElement>(null);
+//   // // const { socket } = useSocket();
+
+//   // const [isLoading, setIsLoading] = useState<boolean>(false);
+//   // const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+//   // const [selectedMessage, setSelectedMessage] = useState<IMessage | null>(null);
+//   // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+
+//   const messagesEndRef = useRef<HTMLDivElement>(null);
+//   const { userSocket } = useSockets();
+//   const [visibilityState, setVisibilityState] = useState<boolean>(true);
+//   const chatVisibilityRef = useRef<boolean>(true);
+//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+//   const [selectedMessage, setSelectedMessage] = useState<IMessage | null>(null);
+//   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+//   const seenMessageIdsRef = useRef<Set<string>>(new Set());
+//   const [isLoading, setIsLoading] = useState<boolean>(false);
+//   const [localMessages, setLocalMessages] = useState<IMessage[]>(messages);
+//   const documentVisibleRef = useRef<boolean>(true);
+//   const selectedChatRef = useRef<string | null>(null);
+//   const unseenMessageIdsRef = useRef<Set<string>>(new Set());
+
+
+//   useEffect(() => {
+//     setLocalMessages(messages);
+//   }, [messages]);
+
+
+//   useEffect(() => {
+//     if (selectedChat) {
+//       checkAndUpdateUnseenMessages();
+//     }
+//   }, [selectedChat, messages])
+
+
+//   const checkAndUpdateUnseenMessages = () => {
+//     if (!selectedChat || !ownUser || !userSocket || !chatVisibilityRef.current) return;
+
+//     const unseenMessages = localMessages.filter(msg =>
+//       msg.sender._id !== ownUser.id &&
+//       !msg.seen &&
+//       !seenMessageIdsRef.current.has(msg._id!)
+//     );
+
+//     if (unseenMessages.length > 0) {
+//       const messageIds = unseenMessages.map(msg => msg._id!);
+//       userSocket.emit("messageSeen", {
+//         userID: ownUser.id,
+//         chatID: selectedChat._id,
+//         messageIds
+//       });
+
+//       messageIds.forEach(id => seenMessageIdsRef.current.add(id));
+//     }
 //   };
 
 //   useEffect(() => {
-//     const fetchUserProfile = async () => {
-//       try {
-//         if (loggedInUser?.username === username) {
-//           setUser(loggedInUser);
-//           setOwnProfile(true);
-//         } else {
-//           const { data } = await axiosInstance.get(`/users/${username}`);
-//           setUser(data);
-//           setOwnProfile(false);
-//         }
-//       } catch (error) {
-//         // handle error
+//     const handleVisibilityChange = () => {
+//       const isVisible = !document.hidden;
+//       documentVisibleRef.current = isVisible;
+//       setVisibilityState(isVisible);
+//       chatVisibilityRef.current = isVisible;
+
+//       if (isVisible && selectedChat) {
+//         markMessagesAsSeen();
 //       }
 //     };
 
-//     fetchUserProfile();
-//   }, [username, loggedInUser, handleProfileUpdate]);
+//     document.addEventListener("visibilitychange", handleVisibilityChange);
+//     return () => {
+//       document.removeEventListener("visibilitychange", handleVisibilityChange);
+//     };
+//   }, [selectedChat]);
 
-//   const renderContent = () => {
-//     switch (activeTab) {
-//       case 'posts':
-//         return <PostFeed />;
-//       case 'info':
-//         return <InfoComponent onProfileUpdate={handleProfileUpdate} />;
-//       // case 'friends':
-//       //   return <FriendsList />;
-//       // case 'groups':
-//       //   return <GroupsList />;
-//       default:
-//         return <PostFeed />;
+
+//   // Handle real-time message seen updates
+//   useEffect(() => {
+//     if (!userSocket) return;
+
+//     const handleMessageSeen = (data: { chatId: string; messageIds: string[]; seenBy: string }) => {
+//       if (data.chatId === selectedChat?._id) {
+//         setLocalMessages(prevMessages =>
+//           prevMessages.map(msg => {
+//             if (data.messageIds.includes(msg._id!)) {
+//               return { ...msg, seen: true };
+//             }
+//             return msg;
+//           })
+//         );
+//       }
+//     };
+
+//     userSocket.on('messageSeen', handleMessageSeen);
+//     return () => {
+//       userSocket.off('messageSeen', handleMessageSeen);
+//     };
+//   }, [userSocket, selectedChat]);
+
+//   useEffect(() => {
+//     if (selectedChat) {
+//       selectedChatRef.current = selectedChat._id;
+//       markMessagesAsSeen();
+//     }
+
+//     return () => {
+//       selectedChatRef.current = null;
+//     };
+//   }, [selectedChat, messages]);
+
+
+//   const markMessagesAsSeen = () => {
+//     if (!selectedChat || !ownUser || !userSocket || !documentVisibleRef.current) return;
+
+//     const unseenMessages = localMessages.filter(msg =>
+//       msg.sender._id !== ownUser.id &&
+//       !msg.seen &&
+//       !unseenMessageIdsRef.current.has(msg._id!)
+//     );
+
+//     if (unseenMessages.length > 0) {
+//       const messageIds = unseenMessages.map(msg => msg._id!);
+//       userSocket.emit("messageSeen", {
+//         userID: ownUser.id,
+//         chatID: selectedChat._id,
+//         messageIds
+//       });
+
+//       // Add to seen set
+//       messageIds.forEach(id => unseenMessageIdsRef.current.add(id));
 //     }
 //   };
 
-//   return (
-//     <div className="flex bg-gray-100">
-//       <div className="flex-1 flex flex-col">
-//         <div className="grid grid-cols-3 gap-4">
-//           <div className="col-span-3">
-//             <UserTitleCard activeTab={activeTab} user={user} />
+
+//   useEffect(() => {
+//     if (!isLoading) {
+//       scrollToBottom();
+//     }
+//   }, [messages, isLoading]);
+
+//   const scrollToBottom = () => {
+//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+//   };
+
+//   useEffect(() => {
+//     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+//   }, [messages]);
+
+//   const getDateLabel = (date: Date): string => {
+//     const today = new Date();
+//     if (isSameDay(date, today)) {
+//       return "Today";
+//     } else if (isSameDay(date, subDays(today, 1))) {
+//       return "Yesterday";
+//     }
+//     return format(date, 'MMMM dd, yyyy');
+//   };
+
+//   // Group messages by date
+//   const groupedMessages = messages.reduce((acc, message) => {
+//     const messageDate = message.createdAt ? new Date(message.createdAt) : new Date();
+//     const dateKey = format(messageDate, 'yyyy-MM-dd');
+//     if (!acc[dateKey]) {
+//       acc[dateKey] = [];
+//     }
+//     acc[dateKey].push(message);
+//     return acc;
+//   }, {} as Record<string, IMessage[]>);
+
+//   // const getDateLabel = (date: Date) => {
+//   //   const today = new Date();
+//   //   if (isSameDay(date, today)) {
+//   //     return "Today";
+//   //   } else if (isSameDay(date, subDays(today, 1))) {
+//   //     return "Yesterday";
+//   //   } else {
+//   //     return format(date, 'MMMM dd, yyyy');
+//   //   }
+//   // };
+
+//   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, message: IMessage) => {
+//     setAnchorEl(event.currentTarget);
+//     setSelectedMessage(message);
+//   };
+
+//   const handleMenuClose = () => {
+//     setAnchorEl(null);
+//   };
+
+//   const handleDeleteClick = () => {
+//     handleMenuClose();
+//     setIsDeleteModalOpen(true);
+//   };
+
+//   const handleDeleteConfirm = () => {
+//     // if (selectedMessage && socket) {
+//     //   socket.emit('deleteMessage', { messageId: selectedMessage._id, chatId: selectedChat._id });
+//     // }
+//     setIsDeleteModalOpen(false);
+//   };
+
+
+//   // const groupedMessages = messages.reduce((acc, message) => {
+//   //   const messageDate = message.createdAt ? new Date(message.createdAt) : new Date();
+//   //   const dateKey = format(messageDate, 'yyyy-MM-dd');
+//   //   if (!acc[dateKey]) {
+//   //     acc[dateKey] = [];
+//   //   }
+//   //   acc[dateKey].push(message);
+//   //   return acc;
+//   // }, {} as Record<string, IMessage[]>);
+
+
+//   // Group messages by date
+//   // const groupedMessages = messages.reduce((acc, message) => {
+//   //   const messageDate = message.createdAt ? new Date(message.createdAt) : new Date();
+//   //   const dateKey = format(messageDate, 'yyyy-MM-dd');
+//   //   if (!acc[dateKey]) {
+//   //     acc[dateKey] = [];
+//   //   }
+//   //   acc[dateKey].push(message);
+//   //   return acc;
+//   // }, {} as Record<string, IMessage[]>);
+
+//   const renderMessage = (msg: IMessage, isOwnMessage: boolean) => {
+//     const messageTime = msg.createdAt ? format(new Date(msg.createdAt), 'HH:mm') : 'Unknown Time';
+
+//     return (
+//       <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-4 group relative`}>
+//         {!isOwnMessage && (
+//           <Avatar
+//             src={msg.sender.profileImage}
+//             style={{ backgroundColor: "#FB923C", color: "white" }}
+//             className="mr-2 mt-1"
+//           >
+//             {msg.sender.displayName?.[0] || '?'}
+//           </Avatar>
+//         )}
+//         <div className="relative flex items-center"> {/* Flex container to hold both message and icon */}
+//           {/* Adjust position of the 3-dot button */}
+//           {isOwnMessage && (
+//             <Fade in={true}>
+//               <IconButton
+//                 size="small"
+//                 className="absolute left-[0px] top-1/2 transform -translate-y-1/2 bg-gray-100 hover:bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+//                 onClick={(e) => handleMenuOpen(e, msg)}
+//               >
+//                 <CiMenuKebab fontSize="small" />
+//               </IconButton>
+//             </Fade>
+//           )}
+//           <div className={`rounded-lg p-3 max-w-xs ${isOwnMessage ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'} shadow-md`}>
+//             {msg.content && <Typography>{msg.content}</Typography>}
+//             {msg.media && msg.media.map((media, index) => (
+//               <div key={index} className="mt-2">
+//                 {media.type === 'image' && (
+//                   <img src={media.url} alt="Shared image" className="max-w-full h-auto rounded" />
+//                 )}
+//                 {media.type === 'video' && (
+//                   <video src={media.url} controls className="max-w-full h-auto rounded" />
+//                 )}
+//                 {media.type === 'audio' && (
+//                   <audio src={media.url} controls className="max-w-full" />
+//                 )}
+//                 {media.type === 'application' && (
+//                   <a href={media.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+//                     View Document
+//                   </a>
+//                 )}
+//               </div>
+//             ))}
+//             <div className="text-xs mt-1 text-gray-400 flex justify-end items-center">
+//               <span>{messageTime}</span>
+//               {isOwnMessage && (
+//                 <span className="ml-1">
+//                   {msg.seen ? (
+//                     <BsCheck2All className="text-blue-500" size={16} /> // Blue double check for seen
+//                   ) : (
+//                     <BsCheck2 className="text-gray-500" size={16} /> // Gray single check for sent
+//                   )}
+//                 </span>
+//               )}
+//             </div>
 //           </div>
-//           <div className="col-span-3">
-//             <ProfileTabs setActiveTab={setActiveTab} ownProfile={ownProfile} />
-//           </div>
-//           <div style={{scrollbarWidth:'none',WebkitOverflowScrolling:'touch'}} className="col-span-3 overflow-y-scroll h-[53vh]">
-//             {renderContent()}
+//         </div>
+//         {isOwnMessage && (
+//           <Avatar
+//             src={ownUser?.profileImage}
+//             style={{ backgroundColor: "#FB923C", color: "white" }}
+//             className="ml-2 mt-1"
+//           >
+//             {ownUser?.username?.[0] || '?'}
+//           </Avatar>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   if (!selectedChat) {
+//     return (
+//       <div className="flex-1 flex flex-col items-center justify-center bg-gray-900 text-white">
+//         <div className="w-64 h-64 bg-gray-800 rounded-lg shadow-lg p-4 mb-8 relative overflow-hidden">
+//           <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 opacity-20"></div>
+//           <div className="relative z-10 h-full flex flex-col items-center justify-center">
+//             <GamepadIcon style={{ fontSize: 64, marginBottom: 16 }} />
+//             <Typography variant="h5" className="text-center mb-4 font-pixel">
+//               Gamer Chat
+//             </Typography>
+//             <Typography variant="body2" className="text-center mb-4 font-pixel">
+//               Select a chat to start a conversation!
+//             </Typography>
+//             <div className="flex space-x-2">
+//               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+//               <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse delay-75"></div>
+//               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse delay-150"></div>
+//             </div>
 //           </div>
 //         </div>
 //       </div>
-//       <div className="w-1/3">
-//         <UserProfileCard user={user} ownProfile={ownProfile} />
+//     );
+//   }
+
+//   return (
+//     <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+//       {isLoading ? (
+//         <div className="flex justify-center items-center h-full">
+//           <Typography>Loading messages...</Typography>
+//         </div>
+//       ) : (
+//         Object.keys(groupedMessages).map((dateKey) => {
+//           const date = new Date(dateKey);
+//           const dateLabel = getDateLabel(date);
+
+//           return (
+//             <div key={dateKey}>
+//               <div className="text-center text-gray-500 my-4">
+//                 <Typography variant="body2" className="bg-gray-200 inline-block px-3 py-1 rounded-full">
+//                   {dateLabel}
+//                 </Typography>
+//               </div>
+//               {groupedMessages[dateKey].map((msg, index) => {
+//                 const isOwnMessage = msg.sender._id === ownUser?.id;
+//                 return (
+//                   <div key={index}>
+//                     {renderMessage(msg, isOwnMessage)}
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           );
+//         })
+//       )}
+//       <div ref={messagesEndRef} />
+
+//       <Menu
+//         anchorEl={anchorEl}
+//         open={Boolean(anchorEl)}
+//         onClose={handleMenuClose}
+//         TransitionComponent={Fade}
+//       >
+//         <MenuItem onClick={handleDeleteClick} className="text-red-500 hover:bg-red-50">
+//           <DeleteIcon fontSize="small" className="mr-2" />
+//           Delete
+//         </MenuItem>
+//       </Menu>
+
+//       <ConfirmationModal
+//         isOpen={isDeleteModalOpen}
+//         onClose={() => setIsDeleteModalOpen(false)}
+//         onConfirm={handleDeleteConfirm}
+//         title="Delete Message"
+//         content="Are you sure you want to delete this message? This action cannot be undone."
+//       />
+//     </div>
+//   );
+// };
+
+// export default ChatBody;
+
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+// // import React, { useCallback, useEffect, useRef, useState } from "react";
+// // import { Typography } from "@mui/material";
+// // import ChatList from "../../components/User/ChagPage/ChatList";
+// // import ChatBody from "../../components/User/ChagPage/ChatBody";
+// // import ChatFooter from "../../components/User/ChagPage/ChatFooter";
+// // import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
+// // import ChatHeader from "../../components/User/ChagPage/ChatHeader";
+// // import { useAppSelector } from "../../store/hooks";
+// // import { selectUser } from "../../Slices/userSlice/userSlice";
+// // import { IChatConversation, IMedia, IMessage } from "../../interfaces/userInterfaces/apiInterfaces";
+// // import axiosInstanceChat from "../../services/userServices/axiosInstanceChat";
+// // import { toast } from "sonner";
+// // import { useSocket } from "../../services/userServices/socketProvider";
+// // import VideoCallContainer from "../../components/User/ChagPage/VideoCallContainer";
+// // import { Button, Snackbar } from '@mui/material'
+
+// // interface IncomingCall {
+// //   roomID: string;
+// //   callerId: string;
+// // }
+// // const ChatPage: React.FC = () => {
+// //   const ownUser = useAppSelector(selectUser);
+// //   const { socket } = useSocket();
+// //   const fileInputRef = useRef<HTMLInputElement>(null);
+
+// //   const [selectedChat, setSelectedChat] = useState<IChatConversation | null>(null);
+// //   const [message, setMessage] = useState<string>("");
+// //   const [conversations, setConversations] = useState<IChatConversation[]>([]);
+// //   const [messages, setMessages] = useState<IMessage[]>([]);
+// //   const [attachment, setAttachment] = useState<File | null>(null);
+// //   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+// //   const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
+
+
+// //   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
+// //   const [inCall, setInCall] = useState(false);
+
+// //   useEffect(() => {
+// //     if (socket) {
+// //       socket.on('callInvitation', (data: any) => {
+// //         if (data.receiverId === ownUser?.id) {
+// //           setIncomingCall(data); // Store the incoming call details
+// //         }
+// //       });
+// //     }
+// //     return () => {
+// //       if (socket) {
+// //         socket.off('callInvitation');
+// //       }
+// //     };
+// //   }, [socket, ownUser?.id]);
+
+// //   const handleAcceptCall = () => {
+// //     setInCall(true); // Switch to in-call state
+// //     setIncomingCall(null); // Clear the call invitation notification
+// //   };
+
+// //   // Handle rejecting the video call
+// //   const handleRejectCall = () => {
+// //     setIncomingCall(null); // Clear the call invitation notification
+// // };
+
+// import React, { useCallback, useEffect, useRef, useState } from "react";
+// import { Typography, Button, Snackbar } from "@mui/material";
+// import ChatList from "../../components/User/ChagPage/ChatList";
+// import ChatBody from "../../components/User/ChagPage/ChatBody";
+// import ChatFooter from "../../components/User/ChagPage/ChatFooter";
+// import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
+// import ChatHeader from "../../components/User/ChagPage/ChatHeader";
+// import { useAppSelector } from "../../store/hooks";
+// import { selectUser } from "../../Slices/userSlice/userSlice";
+// import { IChatConversation, IMedia, IMessage } from "../../interfaces/userInterfaces/apiInterfaces";
+// import { toast } from "sonner";
+// import { useSockets } from "../../context/socketContext";
+// import VideoCallContainer from "../../components/User/ChagPage/VideoCallContainer";
+// import axiosInstance from "../../../src/services/userServices/axiosInstance";
+// import { getPresignedUrl, uploadImageToS3 } from "../../Utils/imageUploadHelper";
+
+// interface IncomingCall {
+//   roomID: string;
+//   callerId: string;
+// }
+
+// const ChatPage: React.FC = () => {
+//   const ownUser = useAppSelector(selectUser);
+//   const { userSocket } = useSockets();
+//   const fileInputRef = useRef<HTMLInputElement>(null);
+
+//   const [selectedChat, setSelectedChat] = useState<IChatConversation | null>(null);
+//   const [message, setMessage] = useState<string>("");
+//   const [conversations, setConversations] = useState<IChatConversation[]>([]);
+//   const [messages, setMessages] = useState<IMessage[]>([]);
+//   const [attachment, setAttachment] = useState<File | null>(null);
+//   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+//   const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
+
+//   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
+//   const [inCall, setInCall] = useState(false);
+//   const API_URL = import.meta.env.VITE_STREAMING_SERVICE_API_URL;
+
+//   // useEffect(() => {
+//   //   if (socket) {
+//   //     socket.on('callInvitation', (data: IncomingCall) => {
+//   //       if (data.callerId !== ownUser?.id) {
+//   //         setIncomingCall(data);
+//   //       }
+//   //     });
+//   //   }
+//   //   return () => {
+//   //     if (socket) {
+//   //       socket.off('callInvitation');
+//   //     }
+//   //   };
+//   // }, [socket, ownUser?.id]);
+
+//   const handleAcceptCall = () => {
+//     // if (socket && incomingCall) {
+//     //   socket.emit('callAccepted', { callerId: incomingCall.callerId, roomID: incomingCall.roomID });
+//     //   setInCall(true);
+//     //   setIncomingCall(null);
+//     // }
+//   };
+
+//   const handleRejectCall = () => {
+//     // if (socket && incomingCall) {
+//     //   socket.emit('callRejected', { callerId: incomingCall.callerId });
+//     //   setIncomingCall(null);
+//     // }
+//   };
+
+
+//   // Fetch conversations and unread counts
+//   const fetchConversations = useCallback(async () => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-conversations/${ownUser?.id}`);
+//       const sortedConversations = response.data.sort(
+//         (a: IChatConversation, b: IChatConversation) =>
+//           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+//       );
+//       setConversations(sortedConversations);
+//       await fetchUnreadCounts();
+//     } catch (error) {
+//       toast.error("Unable to fetch chats. Try again later.");
+//       console.error("Error fetching conversations:", error);
+//     }
+//   }, [ownUser]);
+
+//   const fetchUnreadCounts = useCallback(async () => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-unread-counts/${ownUser?.id}`);
+//       setUnreadCounts(response.data);
+//     } catch (error) {
+//       console.error("Error fetching unread counts:", error);
+//     }
+//   }, [ownUser]);
+
+//   // Socket event handlers
+//   const handleNewMessage = useCallback(
+//     (msg: IMessage) => {
+//       setMessages((prevMessages) => {
+//         const messageExists = prevMessages.some((m) => m._id === msg._id);
+//         return messageExists ? prevMessages : [...prevMessages, msg];
+//       });
+//       setConversations((prevConversations) => {
+//         const chatIndex = prevConversations.findIndex((c) => c._id === msg.chatId);
+
+//         // If the conversation is already in the list, update it and move it to the top
+//         if (chatIndex !== -1) {
+//           const updatedChat = {
+//             ...prevConversations[chatIndex],
+//             updatedAt: new Date().toISOString() // Ensuring string format for updatedAt
+//           };
+
+//           const newConversations = [
+//             updatedChat, // Move the updated chat to the top
+//             ...prevConversations.filter((_, index) => index !== chatIndex) // Filter out the old chat position
+//           ];
+//           return newConversations;
+//         } else {
+//           // If the conversation is not found, add it (in case of a newly created chat)
+//           return prevConversations;
+//         }
+//       });
+
+//       if (msg.sender._id !== ownUser?.id) {
+//         setUnreadCounts((prev) => ({
+//           ...prev,
+//           [msg.chatId]: (prev[msg.chatId] || 0) + 1,
+//         }));
+//       }
+//     },
+//     [ownUser]
+//   );
+
+
+//   const handleUnreadCountUpdate = useCallback(
+//     ({ chatId, unreadCount }: { chatId: string; unreadCount: number }) => {
+//       setUnreadCounts((prev) => ({
+//         ...prev,
+//         [chatId]: unreadCount,
+//       }));
+//     },
+//     []
+//   );
+
+//   const handleMessageRead = useCallback(({ chatId }: { chatId: string }) => {
+//     setMessages((prevMessages) =>
+//       prevMessages.map((msg) =>
+//         msg.chatId === chatId && !msg.seen
+//           ? { ...msg, seen: true }
+//           : msg
+//       )
+//     );
+
+//     setUnreadCounts((prev) => ({
+//       ...prev,
+//       [chatId]: 0,
+//     }));
+//   }, []);
+
+//   // useEffect(() => {
+//   //   if (selectedChat && socket && ownUser) {
+//   //     socket.emit("markMessagesAsRead", {
+//   //       chatId: selectedChat._id,
+//   //       userId: ownUser.id,
+//   //     });
+//   //   }
+//   // }, [selectedChat, socket, ownUser]);
+
+//   const fetchMessages = useCallback(async (chatId: string) => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-messages/${chatId}`);
+//       console.log("Fetch messages response: ", response)
+//       setMessages(response.data);
+//     } catch (error) {
+//       console.error("Error fetching messages:", error);
+//     }
+//   }, []);
+
+//   // const handleSend = async () => {
+//   //   if ((message.trim() || attachment) && selectedChat && ownUser && socket) {
+//   //     let mediaUrl = "";
+
+//   //     if (attachment) {
+//   //       try {
+//   //         mediaUrl = await uploadFile(attachment);
+//   //       } catch (error) {
+//   //         return;
+//   //       }
+//   //     }
+
+//   //     const newMessage: IMessage = {
+//   //       chatId: selectedChat._id,
+//   //       sender: {
+//   //         _id: ownUser.id,
+//   //         displayName: ownUser.username,
+//   //         profileImage: ownUser.profileImage,
+//   //       },
+//   //       content: message,
+//   //       media: mediaUrl ? [{ type: attachment?.type.split("/")[0] as IMedia["type"], url: mediaUrl }] : undefined,
+//   //       createdAt: new Date(),
+//   //       seen: false,
+//   //     };
+
+//   //     setMessages((prevMessages) => [...prevMessages, newMessage]);
+//   //     socket.emit("message", newMessage);
+//   //     clearMessageInput();
+//   //   }
+//   // };
+//   const handleSend = async () => {
+//     if ((message.trim() || attachment) && selectedChat && ownUser && userSocket) {
+//       let mediaUrl = "";
+
+//       if (attachment) {
+//         try {
+//           mediaUrl = await uploadFile(attachment);
+//         } catch (error) {
+//           return;
+//         }
+//       }
+
+//       const newMessage: IMessage = {
+//         chatId: selectedChat._id,
+//         sender: {
+//           _id: ownUser.id,
+//           displayName: ownUser.username,
+//           profileImage: ownUser.profileImage,
+//         },
+//         content: message,
+//         media: mediaUrl ? [{ type: attachment?.type.split("/")[0] as IMedia["type"], url: mediaUrl }] : undefined,
+//         createdAt: new Date(),
+//         seen: false,
+//       };
+
+//       // Update local messages
+//       setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+//       // Emit the message to the server via socket
+//       userSocket.emit("message", newMessage);
+
+//       // Update conversation order: move the chat to the top of the list
+//       setConversations((prevConversations) => {
+//         const chatIndex = prevConversations.findIndex((c) => c._id === selectedChat._id);
+
+//         // If the chat is already in the list, update it and move it to the top
+//         if (chatIndex !== -1) {
+//           const updatedChat = {
+//             ...prevConversations[chatIndex],
+//             updatedAt: new Date().toISOString(),
+//           };
+
+//           return [
+//             updatedChat, // Move the updated chat to the top
+//             ...prevConversations.filter((_, index) => index !== chatIndex), // Keep the rest of the chats
+//           ];
+//         } else {
+//           // If the chat is not found, return as is (should not normally happen)
+//           return prevConversations;
+//         }
+//       });
+
+//       // Clear message input
+//       clearMessageInput();
+//     }
+//   };
+
+//   const clearMessageInput = () => {
+//     setMessage("");
+//     removeAttachment();
+//   };
+
+//   const removeAttachment = () => {
+//     setAttachment(null);
+//     setPreviewUrl(null);
+//     if (fileInputRef.current) fileInputRef.current.value = "";
+//   };
+
+//   const uploadFile = async (file: File): Promise<string> => {
+//     try {
+//       if (!file || !ownUser || !ownUser.id) {
+//         toast.error("Error adding attachment");
+//         return Promise.reject(new Error("Attachment or user not found"));
+//       }
+//       const { uploadUrl, key } = await getPresignedUrl(ownUser.id, "chat_media", API_URL);
+//       await uploadImageToS3(uploadUrl, file);
+//       const attachmentUrl = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${key}`;
+//       // await axiosInstanceChat.post("/upload-media", attachmentUrl);
+//       return attachmentUrl;
+//     } catch (error) {
+//       toast.error("Failed to upload file");
+//       throw error;
+//     }
+//   };
+
+
+
+//   // useEffect(() => {
+//   //   if (ownUser?.id) {
+//   //     fetchConversations();
+//   //   }
+
+//   //   if (socket && ownUser) {
+//   //     socket.emit("joinUserRoom", ownUser.id);
+//   //     socket.on("newMessage", handleNewMessage);
+//   //     socket.on("unreadCountUpdate", handleUnreadCountUpdate);
+//   //     socket.on("messageRead", handleMessageRead);
+
+//   //     // Listen for conversation updates (to reorder conversations)
+//   //     socket.on("conversationUpdated", ({ chatId, updatedAt }: { chatId: string; updatedAt: string }) => {
+//   //       setConversations((prevConversations) => {
+//   //         const chatIndex = prevConversations.findIndex((c) => c._id === chatId);
+
+//   //         if (chatIndex !== -1) {
+//   //           const updatedChat = { ...prevConversations[chatIndex], updatedAt };
+
+//   //           const newConversations = [
+//   //             updatedChat, // Move the updated chat to the top
+//   //             ...prevConversations.filter((_, index) => index !== chatIndex),
+//   //           ];
+//   //           return newConversations;
+//   //         } else {
+//   //           return prevConversations;
+//   //         }
+//   //       });
+//   //     });
+//   //     socket.on('messageDeleted', ({ messageId, chatId }: { messageId: string; chatId: string }) => {
+//   //       setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
+
+//   //       // Update the last message in the conversation list if needed
+//   //       setConversations((prevConversations) => {
+//   //         return prevConversations.map((conv) => {
+//   //           if (conv._id === chatId) {
+//   //             const lastMessage = messages.find((msg) => msg._id !== messageId);
+//   //             return { ...conv, lastMessage };
+//   //           }
+//   //           return conv;
+//   //         });
+//   //       });
+//   //     });
+//   //     return () => {
+//   //       socket.off("newMessage", handleNewMessage);
+//   //       socket.off("unreadCountUpdate", handleUnreadCountUpdate);
+//   //       socket.off("messageRead", handleMessageRead);
+//   //       socket.off("conversationUpdated");
+//   //       socket.emit("leaveUserRoom", ownUser.id);
+//   //       socket.off('messageDeleted');
+
+//   //     };
+//   //   }
+//   // }, [socket, ownUser, handleNewMessage, handleUnreadCountUpdate, handleMessageRead]);
+
+//   // useEffect(() => {
+//   //   if (selectedChat && socket && ownUser) {
+//   //     fetchMessages(selectedChat._id);
+//   //     socket.emit("join", selectedChat._id);
+//   //     socket.emit("messageSeen", { chatId: selectedChat._id, userId: ownUser.id });
+//   //   }
+//   // }, [selectedChat, socket, ownUser, fetchMessages]);
+
+//   useEffect(() => {
+//     if (selectedChat && ownUser) {
+//       fetchMessages(selectedChat._id);
+//     }
+//   }, [selectedChat, ownUser, fetchMessages]);
+
+
+//   useEffect(() => {
+//     if (ownUser?.id) {
+//       fetchConversations();
+//     }
+
+//     // if (socket && ownUser) {
+//     //   socket.emit("joinUserRoom", ownUser.id);
+//     //   socket.on("newMessage", handleNewMessage);
+//     //   socket.on("unreadCountUpdate", handleUnreadCountUpdate);
+//     //   socket.on("messageRead", handleMessageRead);
+
+//     //   // Listen for conversation updates (to reorder conversations)
+//     //   socket.on("conversationUpdated", ({ chatId, updatedAt }: { chatId: string; updatedAt: string }) => {
+//     //     setConversations((prevConversations) => {
+//     //       const chatIndex = prevConversations.findIndex((c) => c._id === chatId);
+
+//     //       if (chatIndex !== -1) {
+//     //         const updatedChat = { ...prevConversations[chatIndex], updatedAt };
+
+//     //         const newConversations = [
+//     //           updatedChat, // Move the updated chat to the top
+//     //           ...prevConversations.filter((_, index) => index !== chatIndex),
+//     //         ];
+//     //         return newConversations;
+//     //       } else {
+//     //         return prevConversations;
+//     //       }
+//     //     });
+//     //   });
+//     //   socket.on('messageDeleted', ({ messageId, chatId }: { messageId: string; chatId: string }) => {
+//     //     setMessages((prevMessages) => prevMessages.filter((msg) => msg._id !== messageId));
+
+//     //     // Update the last message in the conversation list if needed
+//     //     setConversations((prevConversations) => {
+//     //       return prevConversations.map((conv) => {
+//     //         if (conv._id === chatId) {
+//     //           const lastMessage = messages.find((msg) => msg._id !== messageId);
+//     //           return { ...conv, lastMessage };
+//     //         }
+//     //         return conv;
+//     //       });
+//     //     });
+//     //   });
+//     //   return () => {
+//     //     socket.off("newMessage", handleNewMessage);
+//     //     socket.off("unreadCountUpdate", handleUnreadCountUpdate);
+//     //     socket.off("messageRead", handleMessageRead);
+//     //     socket.off("conversationUpdated");
+//     //     socket.emit("leaveUserRoom", ownUser.id);
+//     //     socket.off('messageDeleted');
+
+//     //   };
+//     // }
+//   }, [ownUser, handleNewMessage, handleUnreadCountUpdate, handleMessageRead]);
+
+
+
+//   return (
+//     <div className="flex h-screen bg-gray-200 overflow-hidden">
+//       <div className="w-1/4 bg-white shadow-md border-r border-gray-300">
+//         <div className="p-4 bg-gray-800 flex items-center">
+//           <SportsEsportsIcon className="text-white mr-2" />
+//           <Typography variant="h6" className="text-white font-bold">Gamer Chat</Typography>
+//         </div>
+//         <ChatList
+//           conversations={conversations}
+//           setSelectedChat={setSelectedChat}
+//           ownUser={ownUser}
+//           unreadCounts={unreadCounts}
+//         />
+//       </div>
+
+//       <div className="flex-1 flex flex-col bg-white">
+//         {selectedChat ? (
+//           <>
+//             {/* Show ChatHeader and ChatFooter only when a chat is selected */}
+//             <ChatHeader
+//               selectedChat={selectedChat}
+//               onBack={() => setSelectedChat(null)}
+//               ownUser={ownUser}
+//             />
+//             <ChatBody messages={messages} selectedChat={selectedChat} ownUser={ownUser} />
+//             <ChatFooter
+//               message={message}
+//               setMessage={setMessage}
+//               handleSend={handleSend}
+//               attachment={attachment}
+//               setAttachment={setAttachment}
+//               previewUrl={previewUrl}
+//               setPreviewUrl={setPreviewUrl}
+//               fileInputRef={fileInputRef}
+//             />
+
+//             <div>
+//               {/* Chat UI goes here */}
+//               {inCall && incomingCall?.roomID && (
+//                 <VideoCallContainer roomID={incomingCall.roomID} />
+//               )}
+
+//               {/* Snackbar notification for incoming call */}
+//               <Snackbar
+//                 open={Boolean(incomingCall)}
+//                 message={`Incoming video call from ${incomingCall?.callerId}`}
+//                 action={
+//                   <>
+//                     <Button color="secondary" size="small" onClick={handleAcceptCall}>
+//                       Accept
+//                     </Button>
+//                     <Button color="primary" size="small" onClick={handleRejectCall}>
+//                       Reject
+//                     </Button>
+//                   </>
+//                 }
+//               />
+//             </div>
+//           </>
+//         ) : (
+//           // Always render ChatBody, even when no chat is selected
+//           <ChatBody messages={[]} selectedChat={null} ownUser={ownUser} />
+//         )}
+//       </div>
+
+//     </div>
+//   );
+// };
+
+// export default ChatPage;
+
+
+//+++++++++++++++++++++++++++++++++ duplicate +++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+// import React, { useCallback, useEffect, useRef, useState } from "react";
+// import { Typography, Button, Snackbar } from "@mui/material";
+// import ChatList from "../../components/User/ChagPage/ChatList";
+// import ChatBody from "../../components/User/ChagPage/ChatBody";
+// import ChatFooter from "../../components/User/ChagPage/ChatFooter";
+// import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
+// import ChatHeader from "../../components/User/ChagPage/ChatHeader";
+// import { useAppSelector } from "../../store/hooks";
+// import { selectUser } from "../../Slices/userSlice/userSlice";
+// import { IChatConversation, IMedia, IMessage } from "../../interfaces/userInterfaces/apiInterfaces";
+// import { toast } from "sonner";
+// import { useSockets } from "../../context/socketContext";
+// import VideoCallContainer from "../../components/User/ChagPage/VideoCallContainer";
+// import axiosInstance from "../../../src/services/userServices/axiosInstance";
+// import { getPresignedUrl, uploadImageToS3 } from "../../Utils/imageUploadHelper";
+
+// interface IncomingCall {
+//   roomID: string;
+//   callerId: string;
+// }
+
+// const ChatPage: React.FC = () => {
+//   const ownUser = useAppSelector(selectUser);
+//   const { userSocket } = useSockets();
+//   const fileInputRef = useRef<HTMLInputElement>(null);
+
+//   const [selectedChat, setSelectedChat] = useState<IChatConversation | null>(null);
+//   const [message, setMessage] = useState<string>("");
+//   const [conversations, setConversations] = useState<IChatConversation[]>([]);
+//   const [messages, setMessages] = useState<IMessage[]>([]);
+//   const [attachment, setAttachment] = useState<File | null>(null);
+//   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+//   const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
+
+//   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
+//   const [inCall, setInCall] = useState(false);
+//   const API_URL = import.meta.env.VITE_STREAMING_SERVICE_API_URL;
+
+//   // useEffect(() => {
+//   //   if (socket) {
+//   //     socket.on('callInvitation', (data: IncomingCall) => {
+//   //       if (data.callerId !== ownUser?.id) {
+//   //         setIncomingCall(data);
+//   //       }
+//   //     });
+//   //   }
+//   //   return () => {
+//   //     if (socket) {
+//   //       socket.off('callInvitation');
+//   //     }
+//   //   };
+//   // }, [socket, ownUser?.id]);
+
+//   const handleAcceptCall = () => {
+//     // if (socket && incomingCall) {
+//     //   socket.emit('callAccepted', { callerId: incomingCall.callerId, roomID: incomingCall.roomID });
+//     //   setInCall(true);
+//     //   setIncomingCall(null);
+//     // }
+//   };
+
+//   const handleRejectCall = () => {
+//     // if (socket && incomingCall) {
+//     //   socket.emit('callRejected', { callerId: incomingCall.callerId });
+//     //   setIncomingCall(null);
+//     // }
+//   };
+
+
+//   // Fetch conversations and unread counts
+//   const fetchConversations = useCallback(async () => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-conversations/${ownUser?.id}`);
+//       const sortedConversations = response.data.sort(
+//         (a: IChatConversation, b: IChatConversation) =>
+//           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+//       );
+//       setConversations(sortedConversations);
+//       await fetchUnreadCounts();
+//     } catch (error) {
+//       toast.error("Unable to fetch chats. Try again later.");
+//       console.error("Error fetching conversations:", error);
+//     }
+//   }, [ownUser]);
+
+//   const fetchUnreadCounts = useCallback(async () => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-unread-counts/${ownUser?.id}`);
+//       setUnreadCounts(response.data);
+//     } catch (error) {
+//       console.error("Error fetching unread counts:", error);
+//     }
+//   }, [ownUser]);
+
+//   // Socket event handlers
+//   const handleNewMessage = useCallback(
+//     (msg: IMessage) => {
+//       setMessages((prevMessages) => {
+//         const messageExists = prevMessages.some((m) => m._id === msg._id);
+//         return messageExists ? prevMessages : [...prevMessages, msg];
+//       });
+//       setConversations((prevConversations) => {
+//         const chatIndex = prevConversations.findIndex((c) => c._id === msg.chatId);
+
+//         if (chatIndex !== -1) {
+//           const updatedChat = {
+//             ...prevConversations[chatIndex],
+//             updatedAt: new Date().toISOString() 
+//           };
+
+//           const newConversations = [
+//             updatedChat, 
+//             ...prevConversations.filter((_, index) => index !== chatIndex) 
+//           ];
+//           return newConversations;
+//         } else {
+//           return prevConversations;
+//         }
+//       });
+
+//       if (msg.sender._id !== ownUser?.id) {
+//         setUnreadCounts((prev) => ({
+//           ...prev,
+//           [msg.chatId]: (prev[msg.chatId] || 0) + 1,
+//         }));
+//       }
+//     },
+//     [ownUser]
+//   );
+
+
+//   const handleUnreadCountUpdate = useCallback(
+//     ({ chatId, unreadCount }: { chatId: string; unreadCount: number }) => {
+//       setUnreadCounts((prev) => ({
+//         ...prev,
+//         [chatId]: unreadCount,
+//       }));
+//     },
+//     []
+//   );
+
+//   const handleMessageRead = useCallback(({ chatId }: { chatId: string }) => {
+//     setMessages((prevMessages) =>
+//       prevMessages.map((msg) =>
+//         msg.chatId === chatId && !msg.seen
+//           ? { ...msg, seen: true }
+//           : msg
+//       )
+//     );
+
+//     setUnreadCounts((prev) => ({
+//       ...prev,
+//       [chatId]: 0,
+//     }));
+//   }, []);
+
+//   // useEffect(() => {
+//   //   if (selectedChat && socket && ownUser) {
+//   //     socket.emit("markMessagesAsRead", {
+//   //       chatId: selectedChat._id,
+//   //       userId: ownUser.id,
+//   //     });
+//   //   }
+//   // }, [selectedChat, socket, ownUser]);
+
+//   const fetchMessages = useCallback(async (chatId: string) => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-messages/${chatId}`);
+//       console.log("Fetch messages response: ", response)
+//       setMessages(response.data);
+//     } catch (error) {
+//       console.error("Error fetching messages:", error);
+//     }
+//   }, []);
+
+
+//   const handleSend = async () => {
+//     if ((message.trim() || attachment) && selectedChat && ownUser && userSocket) {
+//       let mediaUrl = "";
+
+//       if (attachment) {
+//         try {
+//           mediaUrl = await uploadFile(attachment);
+//         } catch (error) {
+//           return;
+//         }
+//       }
+
+//       const newMessage: IMessage = {
+//         chatId: selectedChat._id,
+//         sender: {
+//           _id: ownUser.id,
+//           displayName: ownUser.username,
+//           profileImage: ownUser.profileImage,
+//         },
+//         content: message,
+//         media: mediaUrl ? [{ type: attachment?.type.split("/")[0] as "image" | "video" | "audio", url: mediaUrl }] : undefined,
+//         createdAt: new Date(),
+//         seen: false,
+//       };
+
+//       userSocket.emit("message", newMessage);
+//       setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+//       setConversations((prevConversations) => {
+//         const chatIndex = prevConversations.findIndex((c) => c._id === selectedChat._id);
+//         if (chatIndex !== -1) {
+//           const updatedChat = {
+//             ...prevConversations[chatIndex],
+//             updatedAt: new Date().toISOString(),
+//           };
+//           return [
+//             updatedChat,
+//             ...prevConversations.filter((_, index) => index !== chatIndex),
+//           ];
+//         }
+//         return prevConversations;
+//       });
+
+//       clearMessageInput();
+//     }
+//   };
+
+//   const clearMessageInput = () => {
+//     setMessage("");
+//     removeAttachment();
+//   };
+
+//   const removeAttachment = () => {
+//     setAttachment(null);
+//     setPreviewUrl(null);
+//     if (fileInputRef.current) fileInputRef.current.value = "";
+//   };
+
+//   const uploadFile = async (file: File): Promise<string> => {
+//     try {
+//       if (!file || !ownUser || !ownUser.id) {
+//         toast.error("Error adding attachment");
+//         return Promise.reject(new Error("Attachment or user not found"));
+//       }
+//       const { uploadUrl, key } = await getPresignedUrl(ownUser.id, "chat_media", API_URL);
+//       await uploadImageToS3(uploadUrl, file);
+//       const attachmentUrl = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${key}`;
+//       return attachmentUrl;
+//     } catch (error) {
+//       toast.error("Failed to upload file");
+//       throw error;
+//     }
+//   };
+
+
+
+//   useEffect(() => {
+//     if (selectedChat && ownUser) {
+//       fetchMessages(selectedChat._id);
+//     }
+//   }, [selectedChat, ownUser, fetchMessages]);
+
+
+//   useEffect(() => {
+//     if (ownUser?.id) {
+//       fetchConversations();
+//     }
+
+//     if (userSocket && ownUser?.id) {
+//       userSocket.emit("joinUserRoom", ownUser.id);
+
+//       userSocket.on("newMessage", handleNewMessage);
+//       userSocket.on("unreadCountUpdate", handleUnreadCountUpdate);
+//       userSocket.on("messageRead", handleMessageRead);
+//       userSocket.on("conversationUpdated", 
+//         ({ chatId, updatedAt }: { chatId: string; updatedAt: string }) => {
+//           setConversations((prevConversations) => {
+//             const chatIndex = prevConversations.findIndex((c) => c._id === chatId);
+//             if (chatIndex !== -1) {
+//               const updatedChat = { ...prevConversations[chatIndex], updatedAt };
+//               return [
+//                 updatedChat,
+//                 ...prevConversations.filter((_, index) => index !== chatIndex),
+//               ];
+//             }
+//             return prevConversations;
+//           });
+//         }
+//       );
+
+//       userSocket.on('messageDeleted', 
+//         ({ messageId, chatId }: { messageId: string; chatId: string }) => {
+//           setMessages((prevMessages) => 
+//             prevMessages.filter((msg) => msg._id !== messageId)
+//           );
+//           setConversations((prevConversations) => {
+//             return prevConversations.map((conv) => {
+//               if (conv._id === chatId) {
+//                 const lastMessage = messages.find((msg) => msg._id !== messageId);
+//                 return { ...conv, lastMessage };
+//               }
+//               return conv;
+//             });
+//           });
+//         }
+//       );
+
+//       return () => {
+//         userSocket.off("newMessage", handleNewMessage);
+//         userSocket.off("unreadCountUpdate", handleUnreadCountUpdate);
+//         userSocket.off("messageRead", handleMessageRead);
+//         userSocket.off("conversationUpdated");
+//         userSocket.emit("leaveUserRoom", ownUser.id);
+//         userSocket.off('messageDeleted');
+//       };
+//     }
+//   }, [userSocket, ownUser, handleNewMessage, handleUnreadCountUpdate, handleMessageRead]);
+
+
+
+//   return (
+//     <div className="flex h-screen bg-gray-200 overflow-hidden">
+//       <div className="w-1/4 bg-white shadow-md border-r border-gray-300">
+//         <div className="p-4 bg-gray-800 flex items-center">
+//           <SportsEsportsIcon className="text-white mr-2" />
+//           <Typography variant="h6" className="text-white font-bold">Gamer Chat</Typography>
+//         </div>
+//         <ChatList
+//           conversations={conversations}
+//           setSelectedChat={setSelectedChat}
+//           ownUser={ownUser}
+//           unreadCounts={unreadCounts}
+//         />
+//       </div>
+
+//       <div className="flex-1 flex flex-col bg-white">
+//         {selectedChat ? (
+//           <>
+//             {/* Show ChatHeader and ChatFooter only when a chat is selected */}
+//             <ChatHeader
+//               selectedChat={selectedChat}
+//               onBack={() => setSelectedChat(null)}
+//               ownUser={ownUser}
+//             />
+//             <ChatBody messages={messages} selectedChat={selectedChat} ownUser={ownUser} />
+//             <ChatFooter
+//               message={message}
+//               setMessage={setMessage}
+//               handleSend={handleSend}
+//               attachment={attachment}
+//               setAttachment={setAttachment}
+//               previewUrl={previewUrl}
+//               setPreviewUrl={setPreviewUrl}
+//               fileInputRef={fileInputRef}
+//             />
+
+//             <div>
+//               {/* Chat UI goes here */}
+//               {inCall && incomingCall?.roomID && (
+//                 <VideoCallContainer roomID={incomingCall.roomID} />
+//               )}
+
+//               {/* Snackbar notification for incoming call */}
+//               <Snackbar
+//                 open={Boolean(incomingCall)}
+//                 message={`Incoming video call from ${incomingCall?.callerId}`}
+//                 action={
+//                   <>
+//                     <Button color="secondary" size="small" onClick={handleAcceptCall}>
+//                       Accept
+//                     </Button>
+//                     <Button color="primary" size="small" onClick={handleRejectCall}>
+//                       Reject
+//                     </Button>
+//                   </>
+//                 }
+//               />
+//             </div>
+//           </>
+//         ) : (
+//           // Always render ChatBody, even when no chat is selected
+//           <ChatBody messages={[]} selectedChat={null} ownUser={ownUser} />
+//         )}
+//       </div>
+
+//     </div>
+//   );
+// };
+
+// export default ChatPage;
+
+
+
+//+++++++++++++++++++++++++++++++++ duplicate +++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+// import React, { useCallback, useEffect, useRef, useState } from "react";
+// import { Typography, Button, Snackbar } from "@mui/material";
+// import ChatList from "../../components/User/ChagPage/ChatList";
+// import ChatBody from "../../components/User/ChagPage/ChatBody";
+// import ChatFooter from "../../components/User/ChagPage/ChatFooter";
+// import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
+// import ChatHeader from "../../components/User/ChagPage/ChatHeader";
+// import { useAppSelector } from "../../store/hooks";
+// import { selectUser } from "../../Slices/userSlice/userSlice";
+// import { IChatConversation, IMedia, IMessage } from "../../interfaces/userInterfaces/apiInterfaces";
+// import { toast } from "sonner";
+// import axiosInstance from "../../../src/services/userServices/axiosInstance";
+// import { getPresignedUrl, uploadImageToS3 } from "../../Utils/imageUploadHelper";
+// import { useSockets } from "../../context/socketContext";
+
+
+
+// const ChatPage: React.FC = () => {
+//   const ownUser = useAppSelector(selectUser);
+//   const fileInputRef = useRef<HTMLInputElement>(null);
+//   const { userSocket } = useSockets();
+//   const socketConnectedRef = useRef<boolean>(false);
+//   const currentRoomRef = useRef<string | null>(null);
+
+//   const [selectedChat, setSelectedChat] = useState<IChatConversation | null>(null);
+//   const [message, setMessage] = useState<string>("");
+//   const [conversations, setConversations] = useState<IChatConversation[]>([]);
+//   const [attachment, setAttachment] = useState<File | null>(null);
+//   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+//   const [unreadCounts, setUnreadCounts] = useState<{ [key: string]: number }>({});
+//   const [messagesByChat, setMessagesByChat] = useState<{ [chatId: string]: IMessage[] }>({});
+//   const API_URL = import.meta.env.VITE_STREAMING_SERVICE_API_URL;
+
+//   useEffect(() => {
+//     const initializeSocket = () => {
+//       if (!userSocket || !ownUser?.id || socketConnectedRef.current) return;
+
+//       const connectSocket = () => {
+//         console.log('Initializing socket for user:', ownUser.id);
+//         userSocket.emit('join_user', ownUser.id);
+//         socketConnectedRef.current = true;
+//       };
+
+//       if (userSocket.connected) {
+//         connectSocket();
+//       } else {
+//         userSocket.connect();
+//         userSocket.on('connect', connectSocket);
+//       }
+
+//       return () => {
+//         userSocket.off('connect', connectSocket);
+//         socketConnectedRef.current = false;
+//       };
+//     };
+
+//     initializeSocket();
+
+//     return () => {
+//       if (userSocket) {
+//         console.log('Disconnecting socket for user:', ownUser?.id);
+//         userSocket.disconnect();
+//         socketConnectedRef.current = false;
+//       }
+//     };
+//   }, [userSocket, ownUser]);
+
+//   // Chat room management
+//   useEffect(() => {
+//     if (!userSocket || !selectedChat?._id) return;
+
+//     if (currentRoomRef.current) {
+//       userSocket.emit('leave_room', currentRoomRef.current);
+//     }
+
+//     userSocket.emit('join_room', selectedChat._id);
+//     currentRoomRef.current = selectedChat._id;
+
+//     return () => {
+//       if (currentRoomRef.current) {
+//         userSocket.emit('leave_room', currentRoomRef.current);
+//         currentRoomRef.current = null;
+//       }
+//     };
+//   }, [selectedChat, userSocket]);
+
+
+
+
+//   const fetchConversations = useCallback(async () => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-conversations/${ownUser?.id}`);
+//       const sortedConversations = response.data.sort(
+//         (a: IChatConversation, b: IChatConversation) =>
+//           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+//       );
+//       setConversations(sortedConversations);
+//       await fetchUnreadCounts();
+//     } catch (error) {
+//       toast.error("Unable to fetch chats. Try again later.");
+//       console.error("Error fetching conversations:", error);
+//     }
+//   }, [ownUser]);
+
+
+// const handleNewMessage = useCallback(
+//   (msg: IMessage, isLocal: boolean = false) => {
+//       if (!msg.chatId || !msg.sender._id) {
+//           console.log('Invalid message format:', msg);
+//           return;
+//       }
+
+//       if (!isLocal) {
+//           const isParticipant = 
+//               msg.sender._id === ownUser?.id || 
+//               msg.repliedTo === ownUser?.id;
+
+//           if (!isParticipant) {
+//               console.log('Message not for current user:', msg);
+//               return;
+//           }
+//       }
+
+//       setMessagesByChat(prev => {
+//           const chatMessages = [...(prev[msg.chatId] || [])];
+
+//           // Check for duplicates
+//           const isDuplicate = chatMessages.some(existingMsg => 
+//               (msg._id && existingMsg._id === msg._id) || 
+//               (isLocal && existingMsg.sender._id === msg.sender._id && 
+//                existingMsg.content === msg.content &&
+//                Math.abs(new Date(existingMsg.createdAt!).getTime() - new Date(msg.createdAt!).getTime()) < 1000)
+//           );
+
+//           if (!isDuplicate) {
+//               chatMessages.push(msg);
+
+//               setConversations(prevConvs => {
+//                   const chatIndex = prevConvs.findIndex(c => c._id === msg.chatId);
+//                   if (chatIndex === -1) return prevConvs;
+
+//                   const updatedChat = {
+//                       ...prevConvs[chatIndex],
+//                       lastMessage: msg,
+//                       updatedAt: new Date().toISOString()
+//                   };
+
+//                   const newConvs = [...prevConvs];
+//                   newConvs.splice(chatIndex, 1);
+//                   return [updatedChat, ...newConvs];
+//               });
+
+//               if (!isLocal && msg.sender._id !== ownUser?.id) {
+//                   setUnreadCounts(prev => ({
+//                       ...prev,
+//                       [msg.chatId]: (prev[msg.chatId] || 0) + 1
+//                   }));
+//               }
+//           }
+
+//           return {
+//               ...prev,
+//               [msg.chatId]: chatMessages
+//           };
+//       });
+//   },
+//   [ownUser?.id]
+// );
+
+
+
+// useEffect(() => {
+//   if (!userSocket) return;
+
+//   // Handle incoming messages
+//   userSocket.on("newMessage", (newMessage) => {
+//       handleNewMessage(newMessage);
+//   });
+
+//   return () => {
+//       userSocket.off("newMessage");
+//   };
+// }, [userSocket, handleNewMessage]);
+
+
+
+//   const fetchUnreadCounts = useCallback(async () => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-unread-counts/${ownUser?.id}`);
+//       setUnreadCounts(response.data);
+//     } catch (error) {
+//       console.error("Error fetching unread counts:", error);
+//     }
+//   }, [ownUser]);
+
+//   const fetchMessages = useCallback(async (chatId: string) => {
+//     try {
+//       const response = await axiosInstance.get(`user/fetch-messages/${chatId}`);
+//       setMessagesByChat(prev => ({
+//         ...prev,
+//         [chatId]: response.data
+//       }));
+//     } catch (error) {
+//       console.error("Error fetching messages:", error);
+//     }
+//   }, []);
+
+
+// const handleSend = async () => {
+//   if ((!message.trim() && !attachment) || !selectedChat || !ownUser || !userSocket) return;
+
+//   try {
+//       let mediaUrl = "";
+//       if (attachment) {
+//           mediaUrl = await uploadFile(attachment);
+//       }
+
+//       const receiver = selectedChat.users.find(user => user._id !== ownUser.id);
+//       if (!receiver) {
+//           toast.error("Receiver not found");
+//           return;
+//       }
+
+//       const newMessage: IMessage = {
+//           _id: `temp-${Date.now()}`,
+//           chatId: selectedChat._id,
+//           sender: {
+//               _id: ownUser.id,
+//               displayName: ownUser.username,
+//               profileImage: ownUser.profileImage,
+//           },
+//           repliedTo: receiver._id,
+//           content: message,
+//           media: mediaUrl ? [{ type: attachment?.type.split("/")[0] as "image" | "video" | "audio", url: mediaUrl }] : undefined,
+//           createdAt: new Date(),
+//           seen: false,
+//       };
+
+//       // Add message locally first
+//       handleNewMessage(newMessage, true);
+
+//       // Emit to socket
+//       const { _id, ...messageToSend } = newMessage;
+//       userSocket.emit('new_message', messageToSend);
+
+//       clearMessageInput();
+//   } catch (error) {
+//       toast.error("Failed to send message");
+//       console.error("Error sending message:", error);
+//   }
+// };
+
+//   const clearMessageInput = () => {
+//     setMessage("");
+//     removeAttachment();
+//   };
+
+//   const removeAttachment = () => {
+//     setAttachment(null);
+//     setPreviewUrl(null);
+//     if (fileInputRef.current) fileInputRef.current.value = "";
+//   };
+
+//   const uploadFile = async (file: File): Promise<string> => {
+//     try {
+//       if (!file || !ownUser || !ownUser.id) {
+//         toast.error("Error adding attachment");
+//         return Promise.reject(new Error("Attachment or user not found"));
+//       }
+//       const { uploadUrl, key } = await getPresignedUrl(ownUser.id, "chat_media", API_URL);
+//       await uploadImageToS3(uploadUrl, file);
+//       const attachmentUrl = `https://${import.meta.env.VITE_AWS_BUCKET_NAME}.s3.${import.meta.env.VITE_AWS_REGION}.amazonaws.com/${key}`;
+//       return attachmentUrl;
+//     } catch (error) {
+//       toast.error("Failed to upload file");
+//       throw error;
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (selectedChat && ownUser) {
+//       fetchMessages(selectedChat._id);
+//     }
+//   }, [selectedChat, ownUser, fetchMessages]);
+
+//   useEffect(() => {
+//     if (ownUser?.id) {
+//       fetchConversations();
+//     }
+//   }, [ownUser, fetchConversations]);
+
+//   useEffect(()=>{
+//     if(!ownUser || !selectedChat || !userSocket) return
+
+//     userSocket.emit("messageSeen", {userID: ownUser.id, chatID: selectedChat._id})
+//   },[ownUser, selectedChat, handleSend, handleNewMessage])
+
+//   return (
+//     <div className="flex h-screen bg-gray-200 overflow-hidden">
+//       <div className="w-1/4 bg-white shadow-md border-r border-gray-300">
+//         <div className="p-4 bg-gray-800 flex items-center">
+//           <SportsEsportsIcon className="text-white mr-2" />
+//           <Typography variant="h6" className="text-white font-bold">Gamer Chat</Typography>
+//         </div>
+//         <ChatList
+//           conversations={conversations}
+//           setSelectedChat={setSelectedChat}
+//           ownUser={ownUser}
+//           unreadCounts={unreadCounts}
+//         />
+//       </div>
+
+//       <div className="flex-1 flex flex-col bg-white">
+//         {selectedChat ? (
+//           <>
+//             {/* Show ChatHeader and ChatFooter only when a chat is selected */}
+//             <ChatHeader
+//               selectedChat={selectedChat}
+//               onBack={() => setSelectedChat(null)}
+//               ownUser={ownUser}
+//             />
+//             {/* <ChatBody messages={messages} selectedChat={selectedChat} ownUser={ownUser} /> */}
+//             <ChatBody
+//               messages={messagesByChat[selectedChat._id] || []}
+//               selectedChat={selectedChat}
+//               ownUser={ownUser}
+//             />
+//             <ChatFooter
+//               message={message}
+//               setMessage={setMessage}
+//               handleSend={handleSend}
+//               attachment={attachment}
+//               setAttachment={setAttachment}
+//               previewUrl={previewUrl}
+//               setPreviewUrl={setPreviewUrl}
+//               fileInputRef={fileInputRef}
+//             />
+//           </>
+//         ) : (
+//           // Always render ChatBody, even when no chat is selected
+//           <ChatBody messages={[]} selectedChat={null} ownUser={ownUser} />
+//         )}
 //       </div>
 //     </div>
 //   );
 // };
 
-// export default Profile;
+// export default ChatPage;
+
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 
 
-
-// import React, { useState, useCallback, useEffect } from 'react';
-// import Cropper, { Area } from 'react-easy-crop';
-// import { getCroppedImg } from './canvasUtils';
-
-// interface ImageCropperProps {
-//   imageSrc: string;
-//   profile: boolean;
-//   onCropComplete: (croppedImage: string) => void;
-// }
-
-// const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, profile, onCropComplete }) => {
-//   const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-//   const [zoom, setZoom] = useState<number>(1);
-//   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-//   const [aspects, setAspects] = useState<number>(16 / 9)
-
-//   const handleCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
-//     setCroppedAreaPixels(croppedAreaPixels);
-//   }, []);
-
-//   const handleSave = useCallback(async () => {
-//     if (imageSrc && croppedAreaPixels) {
-//       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-//       if (croppedImage) {
-//         const base64String = await convertToBase64(croppedImage);
-//         onCropComplete(base64String);
-//       } else {
-//         console.error('Cropped image is undefined');
-//       }
-//     }
-//   }, [imageSrc, croppedAreaPixels, onCropComplete]);
-
-//   const convertToBase64 = (blobUrl: string): Promise<string> => {
-//     return new Promise((resolve, reject) => {
-//       fetch(blobUrl)
-//         .then(response => response.blob())
-//         .then(blob => {
-//           const reader = new FileReader();
-//           reader.onloadend = () => {
-//             resolve(reader.result as string);
-//           };
-//           reader.onerror = reject;
-//           reader.readAsDataURL(blob);
-//         })
-//         .catch(reject);
-//     });
-//   };
-
-//   return (
-//     <div className="relative w-full h-full flex flex-col items-center justify-center">
-//       <Cropper
-//         image={imageSrc}
-//         crop={crop}
-//         zoom={zoom}
-//         cropShape={profile ? "round" : "rect"}
-//         aspect={profile ? 1 / 1 : 16 / 9}
-//         onCropChange={setCrop}
-//         onCropComplete={handleCropComplete}
-//         onZoomChange={setZoom}
-//         style={{
-//           containerStyle: {
-//             width: '100%',
-//             height: '100%',
-//           },
-//         }}
-//       />
-//       <button
-//         onClick={handleSave}
-//         className="absolute bottom-4 bg-white text-black font-sans font-semibold py-2 px-4 rounded"
-//       >
-//         Save
-//       </button>
-//     </div>
-//   );
-// };
-
-// export default ImageCropper;
+// ChatPage.tsx
 
 
 
+  // Message handling
+  // const handleNewMessage = useCallback(
+  //   (msg: IMessage, isLocal: boolean = false) => {
+  //     if (!msg.chatId || !msg.sender._id) return;
+
+  //     setMessagesByChat(prev => {
+  //       const chatMessages = [...(prev[msg.chatId] || [])];
+
+  //       // Check for duplicates
+  //       const isDuplicate = chatMessages.some(existingMsg => 
+  //         (msg._id && existingMsg._id === msg._id) || 
+  //         (isLocal && existingMsg.sender._id === msg.sender._id && 
+  //          existingMsg.content === msg.content &&
+  //          Math.abs(new Date(existingMsg.createdAt!).getTime() - new Date(msg.createdAt!).getTime()) < 1000)
+  //       );
+
+  //       if (!isDuplicate) {
+  //         chatMessages.push(msg);
+
+  //         // Update conversations list
+  //         setConversations(prevConvs => {
+  //           const chatIndex = prevConvs.findIndex(c => c._id === msg.chatId);
+  //           if (chatIndex === -1) return prevConvs;
+
+  //           const updatedChat = {
+  //             ...prevConvs[chatIndex],
+  //             lastMessage: msg,
+  //             updatedAt: new Date().toISOString()
+  //           };
+
+  //           const newConvs = [...prevConvs];
+  //           newConvs.splice(chatIndex, 1);
+  //           return [updatedChat, ...newConvs];
+  //         });
+
+  //         // Update unread counts for new messages from others
+  //         if (!isLocal && msg.sender._id !== ownUser?.id && !documentVisibleRef.current) {
+  //           setUnreadCounts(prev => ({
+  //             ...prev,
+  //             [msg.chatId]: (prev[msg.chatId] || 0) + 1
+  //           }));
+  //         }
+  //       }
+
+  //       return {
+  //         ...prev,
+  //         [msg.chatId]: chatMessages
+  //       };
+  //     });
+  //   },
+  //   [ownUser?.id]
+  // );
 
 
+  // const handleNewMessage = useCallback(
+  //   (msg: IMessage, isLocal: boolean = false) => {
+  //     console.log("Handle new message: ", msg, isLocal)
+  //     if (!msg.chatId || !msg.sender._id) return;
 
+  //     setMessagesByChat(prev => {
+  //       const chatMessages = [...(prev[msg.chatId] || [])];
 
+  //       if (isLocal) {
+  //         const isDuplicate = chatMessages.some(existingMsg => 
+  //           existingMsg.sender._id === msg.sender._id && 
+  //           existingMsg.content === msg.content &&
+  //           Math.abs(new Date(existingMsg.createdAt!).getTime() - new Date(msg.createdAt!).getTime()) < 1000
+  //         );
 
+  //         if (!isDuplicate) {
+  //           chatMessages.push(msg);
+  //         }
+  //       } else {
+  //         const tempMessageIndex = chatMessages.findIndex(existingMsg => 
+  //           existingMsg._id?.startsWith('temp-') && 
+  //           existingMsg.sender._id === msg.sender._id &&
+  //           existingMsg.content === msg.content
+  //         );
 
+  //         if (tempMessageIndex !== -1) {
+  //           chatMessages[tempMessageIndex] = msg;
+  //         } else {
+  //           const isDuplicate = chatMessages.some(existingMsg => existingMsg._id === msg._id);
+  //           if (!isDuplicate) {
+  //             chatMessages.push(msg);
+  //           }
+  //         }
+  //       }
 
+  //       setConversations(prevConvs => {
+  //         const chatIndex = prevConvs.findIndex(c => c._id === msg.chatId);
+  //         if (chatIndex === -1) return prevConvs;
 
+  //         const updatedChat = {
+  //           ...prevConvs[chatIndex],
+  //           lastMessage: msg,
+  //           updatedAt: new Date().toISOString()
+  //         };
 
+  //         const newConvs = [...prevConvs];
+  //         newConvs.splice(chatIndex, 1);
+  //         return [updatedChat, ...newConvs];
+  //       });
 
+  //       if (!isLocal && msg.sender._id !== ownUser?.id && !documentVisibleRef.current) {
+  //         setUnreadCounts(prev => ({
+  //           ...prev,
+  //           [msg.chatId]: (prev[msg.chatId] || 0) + 1
+  //         }));
+  //       }
 
+  //       return {
+  //         ...prev,
+  //         [msg.chatId]: chatMessages
+  //       };
+  //     });
+  //   },
+  //   [ownUser?.id]
+  // );
 
+  // // Socket event listeners
+  // useEffect(() => {
+  //   if (!userSocket) return;
 
+  //   userSocket.on("newMessage", (newMessage: IMessage) => {
+  //     console.log("userSocket.on newMessage: ", newMessage)
+  //     handleNewMessage(newMessage);
+  //   });
 
+  //   userSocket.on("messageSeen", (data: { chatId: string; messageIds: string[]; seenBy: string }) => {
+  //     setMessagesByChat(prev => {
+  //       const chatMessages = prev[data.chatId] || [];
+  //       return {
+  //         ...prev,
+  //         [data.chatId]: chatMessages.map(msg => 
+  //           data.messageIds.includes(msg._id!) ? { ...msg, seen: true } : msg
+  //         )
+  //       };
+  //     });
+  //   });
 
-
-
-
-
-
-
-
-
-
-import React, { useState, useCallback, useEffect } from 'react';
-import Cropper, { Area } from 'react-easy-crop';
-import { getCroppedImg } from './canvasUtils';
-import Crop32Icon from '@mui/icons-material/Crop32';
-import CropDinIcon from '@mui/icons-material/CropDin';
-import DescriptionModal from './DescriptionModal';
-interface ImageCropperProps {
-    imageSrc: string;
-    profile: boolean;
-    aspectRatio: number;
-    setAspectRatio: (aspectRatio: number) => void; // New prop
-    onCropComplete: (croppedImage: string) => void;
-    isPost: boolean;
-}
-
-const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, profile, aspectRatio, setAspectRatio, onCropComplete, isPost }) => {
-    const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState<number>(1);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-    const [croppedImage, setCroppedImage] = useState<string | null>(null);
-
-    const handleCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
-        setCroppedAreaPixels(croppedAreaPixels);
-    }, []);
-
-    const handleSave = useCallback(async () => {
-        if (imageSrc && croppedAreaPixels) {
-            const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-            if (croppedImage) {
-                const base64String = await convertToBase64(croppedImage);
-                setCroppedImage(base64String);
-                if (isPost) {
-                    setIsModalOpen(true); 
-                } else {
-                    onCropComplete(base64String);
-                }
-            } else {
-                console.error('Cropped image is undefined');
-            }
-        }
-    }, [imageSrc, croppedAreaPixels, onCropComplete, isPost]);
-
-
-    const convertToBase64 = (blobUrl: string): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            fetch(blobUrl)
-                .then(response => response.blob())
-                .then(blob => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        resolve(reader.result as string);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(blob);
-                })
-                .catch(reject);
-        });
-    };
-
-    return (
-        <div className="relative w-full h-full flex flex-col items-center justify-center">
-            <Cropper
-                image={imageSrc}
-                crop={crop}
-                zoom={zoom}
-                cropShape={profile ? "round" : "rect"}
-                aspect={aspectRatio}
-                onCropChange={setCrop}
-                onCropComplete={handleCropComplete}
-                onZoomChange={setZoom}
-                style={{
-                    containerStyle: {
-                        width: '100%',
-                        height: '100%',
-                    },
-                }}
-            />
-            {isPost && (
-                <div className="absolute bottom-24 left-5 flex flex-col ">
-                    <button onClick={() => setAspectRatio(1020 / 400)} className="bg-gray-600 rounded-full p-2 py mb-2">
-                        <Crop32Icon className="text-white" style={{ fontSize: '30px' }} />
-                    </button>
-                    <button onClick={() => setAspectRatio(700 / 400)} className="bg-gray-600 rounded-full p-2">
-                        <CropDinIcon className="text-white" style={{ fontSize: '25px' }} />
-                    </button>
-                </div>
-            )}
-
-            {isPost ? (
-                <>
-                    <button className='absolute bottom-4 bg-white text-black font-sans font-semibold py-2 px-4 rounded' onClick={handleSave}>
-                        Next
-                    </button>
-                    <DescriptionModal
-                        isOpen={isModalOpen}
-                        croppedImage={croppedImage} // Pass cropped image
-                        onClose={() => setIsModalOpen(false)} // Add onClose handler
-                    />
-                </>
-            ) : (
-                <>
-                    <button
-                        onClick={handleSave}
-                        className="absolute bottom-4 bg-white text-black font-sans font-semibold py-2 px-4 rounded"
-                    >
-                        Save
-                    </button>
-                </>
-            )}
-
-
-        </div>
-    );
-};
-
-export default ImageCropper;
-
-
-
-
+  //   return () => {
+  //     userSocket.off("newMessage");
+  //     userSocket.off("messageSeen");
+  //   };
+  // }, [userSocket, handleNewMessage]);

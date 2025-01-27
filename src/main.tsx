@@ -7,21 +7,24 @@ import App from './App';
 import './index.css';
 import { Toaster } from 'sonner';
 import { LoadingProvider } from './context/LoadingContext';
-// import SocketProvider from './services/userServices/socketProvider';
+import { SocketProvider } from './context/socketContext';
+import { AuthSocketHandler } from './context/AuthSocket';
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container!);
 
 root.render(
   <React.StrictMode>
-    <Provider store={store}> {/* Move Provider to wrap SocketProvider */}
+    <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        {/* <SocketProvider> SocketProvider inside Redux context */}
-          <LoadingProvider>
-            <Toaster position="top-center" richColors />
-            <App />
-          </LoadingProvider>
-        {/* </SocketProvider> */}
+        <SocketProvider>
+          <AuthSocketHandler>
+            <LoadingProvider>
+              <Toaster position="top-center" richColors />
+              <App />
+            </LoadingProvider>
+          </AuthSocketHandler>
+        </SocketProvider>
       </PersistGate>
     </Provider>
   </React.StrictMode>

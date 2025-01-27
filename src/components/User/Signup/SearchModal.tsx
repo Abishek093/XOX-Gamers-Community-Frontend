@@ -23,7 +23,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onSubmit }) 
     debounce(async (username: string) => {
       console.log("khjfgdjkfh",username)
       try {
-        const response = await axiosInstance.get(`/check-username?username=${username}`);
+        const response = await axiosInstance.get(`user/check-username?username=${username}`);
         setIsUsernameAvailable(response.data.available);
       } catch (error) {
         console.error('Error checking username availability', error);

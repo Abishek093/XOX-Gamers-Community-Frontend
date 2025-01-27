@@ -85,7 +85,6 @@ interface User {
 }
 
 const Friends: React.FC = () => {
-  const API_URL = import.meta.env.VITE_USER_API_URL;
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [suggestions, setSuggestions] = useState<User[]>([]);
@@ -93,7 +92,7 @@ const Friends: React.FC = () => {
 
   const fetchSuggestions = async () => {
     try {
-      const response = await axiosInstance.get(`fetch-suggestions`);
+      const response = await axiosInstance.get(`user/fetch-suggestions`);
       setSuggestions(response.data.results);
       setLoading(false);
     } catch (error) {
@@ -107,7 +106,7 @@ const Friends: React.FC = () => {
       try {
         setLoading(true);
         const response = await axiosInstance.get(
-          `${API_URL}searchUsers?query=${query}`
+          `user/searchUsers?query=${query}`
         );
         setSearchResults(response.data.results);
         setLoading(false);

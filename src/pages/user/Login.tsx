@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import { useAppDispatch } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
@@ -7,10 +7,12 @@ import { loginUser, googleAuth } from '../../Slices/userSlice/userSlice';
 import { auth, googleProvider } from '../../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { toast } from 'sonner';
+import { Eye, EyeOff } from 'lucide-react'; // Assuming you're using lucide-react for icons
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const initialValues = {
     email: '',
@@ -60,13 +62,16 @@ const Login: React.FC = () => {
             setTimeout(() => navigate('/'), 1000);
           })
           .catch((error: any) => {
-            // setStatus({ success: false, error: error.message });
             toast.error(error.message)
           });
       })
       .catch((error) => {
         toast.error('Google sign-in error: ' + error.message);
       });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -93,16 +98,29 @@ const Login: React.FC = () => {
                 <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
-              <div className="mb-4">
+              <div className="mb-4 relative">
                 <label className="block text-white text-sm font-bold mb-2" htmlFor="password">
                   Password
                 </label>
-                <Field
-                  type="password"
-                  id="password"
-                  name="password"
-                  className="border border-gray-300 p-2 rounded-lg w-full"
-                />
+                <div className="relative">
+                  <Field
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    className="border border-gray-300 p-2 rounded-lg w-full pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
                 <ErrorMessage name="password" component="div" className="text-red-500 text-sm mt-1" />
               </div>
 
@@ -126,7 +144,7 @@ const Login: React.FC = () => {
             Login with Google
           </button>
           <p className="text-sm font-light text-gray-500 dark:text-gray-400 pt-5">
-            Don’t have an account yet? <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500" onClick={() => navigate('/signup')}>Sign up</a>
+            Don't have an account yet? <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500" onClick={() => navigate('/signup')}>Sign up</a>
           </p>
           <p className="text-sm font-light text-gray-500 dark:text-gray-400 pt-2">
             <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500" onClick={() => navigate('/confirm-mail')}>Forget Password?</a>

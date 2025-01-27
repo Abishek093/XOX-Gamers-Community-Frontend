@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import SearchModal from "../../components/User/Signup/SearchModal";
 import Cookies from "js-cookie";
 import { useLoading } from '../../context/LoadingContext';
+import { Eye, EyeOff } from 'lucide-react';
 
 
 const Signup: React.FC = () => {
@@ -24,6 +25,9 @@ const Signup: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempUser, setTempUser] = useState<any>(null);
   const [otp, setOtp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const initialValues = {
     username: "",
     displayName: "",
@@ -35,6 +39,13 @@ const Signup: React.FC = () => {
   const [email, setEmail] = useState("");
   const { setLoading } = useLoading();
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const validationSchema = Yup.object({
     username: Yup.string()
@@ -258,7 +269,7 @@ const Signup: React.FC = () => {
                   className="text-red-500 text-sm mt-1"
                 />
               </div>
-              <div className="mb-4">
+              {/* <div className="mb-4">
                 <label
                   htmlFor="password"
                   className="block text-sm font-semibold mb-1"
@@ -292,6 +303,73 @@ const Signup: React.FC = () => {
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
                   placeholder="Confirm your password"
                 />
+                <ErrorMessage
+                  name="confirmPassword"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div> */}
+                            <div className="mb-4 relative">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-semibold mb-1"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <Field
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    name="password"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500 pr-10"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  className="text-red-500 text-sm mt-1"
+                />
+              </div>
+              
+              <div className="mb-4 relative">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-semibold mb-1"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Field
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500 pr-10"
+                    placeholder="Confirm your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleConfirmPasswordVisibility}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
                 <ErrorMessage
                   name="confirmPassword"
                   component="div"
@@ -335,6 +413,17 @@ const Signup: React.FC = () => {
                 >
                   Sign Up with Google
                 </button>
+              </div>
+              <div className="text-center mt-4">
+                <p className="text-sm text-gray-600">
+                  Already have an account? {' '}
+                  <span 
+                    onClick={() => navigate('/login')}
+                    className="text-blue-500 hover:underline cursor-pointer"
+                  >
+                    Login
+                  </span>
+                </p>
               </div>
               {status && status.error && (
                 <div className="text-red-500 text-sm mt-2">{status.error}</div>

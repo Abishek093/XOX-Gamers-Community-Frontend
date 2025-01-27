@@ -12,6 +12,11 @@ import SettingsPage from '../pages/user/SettingsPage';
 import LoadingPage from '../components/Common/LoadingPage';
 import ChatPage from '../pages/user/ChatPage';
 import NewsPage from '../pages/user/NewsPage';
+import StreamingControl from '../pages/user/Streaming';
+import Live from '../pages/user/Live';
+import StreamViewPage from '../pages/user/StreamViewPage';
+import SocketStatusChecker from '../pages/user/SocketStatusChecker';
+import ExplorePage from '../components/User/Explore/ExplorePage';
 
 const userRoutes = [
   {
@@ -47,8 +52,28 @@ const userRoutes = [
     element: <NewsPage />,
   },
   {
+    path: "streams",
+    element: <StreamingControl />
+  },
+  {
+    path: "go-live",
+    element: <Live />
+  },
+  {
     path: "loading",
     element: <LoadingPage />,
+  },
+  {
+    path: "streams/stream/:streamId",
+    element: <StreamViewPage />,
+  },
+  {
+    path: "socket",
+    element: <SocketStatusChecker />,
+  },
+  {
+    path: "explore",
+    element: <ExplorePage />,
   },
 ];
 

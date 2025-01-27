@@ -55,6 +55,8 @@ import PublicRoute from './Public/UserPublicRoutes';
 // import AdminPublicRoute from './Public/AdminPublicRoute';
 import PrivateRoute from './Protected/UserProtectedRoutes';
 import VideoCall from '../components/User/ChagPage/VideoCall';
+import AdminPublicRoute from './Public/AdminPublicRoute';
+import AdminPrivateRoute from './Protected/AdminProtectedRoutes';
 // import AdminPrivateRoute from './Protected/AdminProtectedRoutes';
 
 const router = createBrowserRouter([
@@ -82,7 +84,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    // element: <AdminPublicRoute />,
+    element: <AdminPublicRoute />,
     children: [
       ...adminPublicRoutes,
     ],
@@ -90,7 +92,7 @@ const router = createBrowserRouter([
 
   {
     path: '/admin',
-    // element: <AdminPrivateRoute />,
+    element: <AdminPrivateRoute />,
     children: [
       {
         element: <AdminLayout />,
