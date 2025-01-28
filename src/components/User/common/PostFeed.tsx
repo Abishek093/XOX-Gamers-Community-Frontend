@@ -1,12 +1,11 @@
 
 import React, { useEffect } from 'react';
-import io from 'socket.io-client';
 import axiosInstance from '../../../services/userServices/axiosInstance';
 import Post from './Post';
 import { GoogleUser, UserData, UserDetails } from '../../../interfaces/userInterfaces/apiInterfaces';
-import { toast } from 'sonner';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../../../Slices/userSlice/userSlice';
+// import { toast } from 'sonner';
+// import { useSelector } from 'react-redux';
+// import { selectUser } from '../../../Slices/userSlice/userSlice';
 
 interface PostFeedProps {
   user: UserData | GoogleUser | UserDetails | null;
@@ -16,7 +15,7 @@ interface PostFeedProps {
 }
 
 const PostFeed: React.FC<PostFeedProps> = ({ user, posts, setPosts, removePost }) => {
-  const ownUser = useSelector(selectUser)
+  // const ownUser = useSelector(selectUser)
 
   // useEffect(() => {
     // const socket = io('http://localhost:3000'); 

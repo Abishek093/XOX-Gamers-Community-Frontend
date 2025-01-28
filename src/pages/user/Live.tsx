@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Camera, Users, Gamepad2, Trophy, Copy, Check, ThumbsUp, ThumbsDown, Send, UserCircle2, MessageCircle, AlertTriangle, StopCircle } from 'lucide-react';
+import { Camera, Users, Gamepad2, Copy, Check, ThumbsUp, ThumbsDown, Send, UserCircle2, MessageCircle, AlertTriangle, StopCircle } from 'lucide-react';
 import axiosInstance from '../../../src/services/userServices/axiosInstance';
 import { getPresignedUrl, uploadImageToS3 } from '../../../src/Utils/imageUploadHelper';
 import { useAppSelector } from '../../../src/store/hooks';
@@ -23,7 +23,7 @@ import { Button } from '../../components/User/LivePage/button';
 import { Input } from '../../components/User/LivePage/input';
 import StreamPlayer from '../../../src/components/User/Live/StreamPlayer';
 import { useLoading } from '../../context/LoadingContext';
-import { Loader2 } from 'lucide-react';
+// import { Loader2 } from 'lucide-react';
 
 // interface UserDto {
 //   id: string;

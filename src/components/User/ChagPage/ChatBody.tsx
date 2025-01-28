@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Typography, IconButton, Menu, MenuItem, Avatar, Fade } from "@mui/material";
+import { Typography, Menu, MenuItem, Avatar, Fade } from "@mui/material";
 import GamepadIcon from "@mui/icons-material/Gamepad";
 import DeleteIcon from '@mui/icons-material/Delete';
 import ConfirmationModal from './ConfirmationModal';
@@ -19,7 +19,7 @@ const ChatBody: React.FC<ChatBodyProps> = ({ selectedChat, ownUser, messages }) 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { userSocket } = useSockets();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedMessage, setSelectedMessage] = useState<IMessage | null>(null);
+  // const [selectedMessage, setSelectedMessage] = useState<IMessage | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [localMessages, setLocalMessages] = useState<IMessage[]>(messages);
@@ -27,7 +27,9 @@ const ChatBody: React.FC<ChatBodyProps> = ({ selectedChat, ownUser, messages }) 
   const lastSeenUpdateRef = useRef<number>(0);
 
   useEffect(() => {
+    setIsLoading(true)
     setLocalMessages(messages);
+    setIsLoading(false)
   }, [messages]);
 
 
@@ -135,10 +137,10 @@ const ChatBody: React.FC<ChatBodyProps> = ({ selectedChat, ownUser, messages }) 
     return acc;
   }, {} as Record<string, IMessage[]>);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, message: IMessage) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedMessage(message);
-  };
+  // const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, message: IMessage) => {
+  //   setAnchorEl(event.currentTarget);
+  //   setSelectedMessage(message);
+  // };
 
   const handleMenuClose = () => {
     setAnchorEl(null);

@@ -11,7 +11,7 @@ interface DescriptionModalProps {
 
 const DescriptionModal: React.FC<DescriptionModalProps> = ({ descriptionProps, isOpen, croppedImage, onClose, onSubmit }) => {
   const [description, setDescription] = useState<string>(descriptionProps || '');
-  const [wordCount, setWordCount] = useState<number>(0);
+  // const [wordCount, setWordCount] = useState<number>(0);
 
   const handleSubmit = () => {
     onSubmit(description, croppedImage); 
@@ -21,7 +21,7 @@ const DescriptionModal: React.FC<DescriptionModalProps> = ({ descriptionProps, i
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
     setDescription(text);
-    setWordCount(text.split(/\s+/).filter(Boolean).length); 
+    // setWordCount(text.split(/\s+/).filter(Boolean).length); 
   };
 
   return isOpen ? (

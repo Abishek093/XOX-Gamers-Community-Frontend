@@ -9,7 +9,6 @@ import { LoginPayload,UserApiData, UserData, VerifyOtpPayload, VerifyOtpResponse
 import { UserState } from '../../interfaces/userInterfaces/storeInterfaces';
 import Cookies from 'js-cookie';
 import { RootState } from '../../store';
-import { useNavigate } from 'react-router-dom';
 
 const initialState: UserState = {
   user: null,
@@ -220,7 +219,7 @@ export const verifyResetOtp = createAsyncThunk<verifyResetOtpResponse, VerifyOtp
 
 export const logout = createAsyncThunk(
   'user/logout',
-  async (_, { dispatch }) => {
+  async () => {  // Removed unused dispatch parameter
     // Clear user data
     Cookies.remove('UserAccessToken');
     Cookies.remove('UserRefreshToken');

@@ -14,8 +14,8 @@ import { toast } from 'sonner';
   const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({ onClose, onSubmit }) => {
     const [communityName, setCommunityName] = useState('');
     const [description, setDescription] = useState('');
-    const [postPermission, setPostPermission] = useState('admin'); // Set default to "admin"
-    const [error, setError] = useState('');
+    const [postPermission, setPostPermission] = useState('admin'); 
+    // const [error, setError] = useState('');
     const [isImageUploadOpen, setIsImageUploadOpen] = useState(false);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const ownUser = useAppSelector(selectUser);
@@ -57,7 +57,7 @@ import { toast } from 'sonner';
           </button>
         </div>
 
-          {error && <p className="text-red-500 mb-4">{error}</p>}
+          {/* {error && <p className="text-red-500 mb-4">{error}</p>} */}
 
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="communityName">

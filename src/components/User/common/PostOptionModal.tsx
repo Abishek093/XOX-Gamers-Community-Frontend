@@ -8,7 +8,7 @@ import axiosInstance from '../../../services/userServices/axiosInstance';
 import ReportModal from '../../Common/ReportModal';
 import ConfirmationModal from '../../Common/ConfirmationModal'; // Import your ConfirmationModal component
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 interface PostOptionModalProps {
   user: UserData | GoogleUser | UserDetails | null;
@@ -39,7 +39,6 @@ const PostOptionModal: React.FC<PostOptionModalProps> = ({
   const [post, setPost] = useState<any>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false); 
   const ownUser = useAppSelector(selectUser);
-  const navigate = useNavigate()
   useEffect(() => {
     const fetchPost = async () => {
       try {

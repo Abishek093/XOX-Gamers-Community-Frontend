@@ -159,7 +159,7 @@ const StreamCard: React.FC<StreamDto> = ({ id, thumbnailUrl, title, description,
   );
 };
 
-const SponsoredCard: React.FC<SponsoredPost> = ({ _id, title, imageUrl, link }) => (
+const SponsoredCard: React.FC<SponsoredPost> = ({ title, imageUrl, link }) => (
   <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300">
     <a href={link} target="_blank" rel="noopener noreferrer" className="block">
       <img src={imageUrl} alt={title} className="w-full h-48 object-cover rounded-t-xl" />

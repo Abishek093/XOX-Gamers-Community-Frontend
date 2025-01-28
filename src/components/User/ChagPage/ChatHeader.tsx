@@ -1,10 +1,10 @@
 import React from "react";
 import { Avatar, IconButton, Typography } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+// import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import VideoCallIcon from "@mui/icons-material/VideoCall"; // Import VideoCallIcon
+// import VideoCallIcon from "@mui/icons-material/VideoCall"; // Import VideoCallIcon
 // import { useSocket } from "../../../services/userServices/socketProvider";
-import { startVideoCall } from "../../../Utils/VideoCallUtils";
+// import { startVideoCall } from "../../../Utils/VideoCallUtils";
 
 interface ChatHeaderProps {
   selectedChat: any;
@@ -19,18 +19,18 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ selectedChat, onBack, ownUser }
     : null;
 
 
-    const handleVideoCall = () => {
-      // if(socket){
-      // const roomID = `room_${selectedChat._id}`;
-      // socket.emit("callInvitation", {
-      //   callerId: ownUser.id,
-      //   receiverId: otherUser._id,
-      //   roomID,
-      // });
+    // const handleVideoCall = () => {
+    //   // if(socket){
+    //   // const roomID = `room_${selectedChat._id}`;
+    //   // socket.emit("callInvitation", {
+    //   //   callerId: ownUser.id,
+    //   //   receiverId: otherUser._id,
+    //   //   roomID,
+    //   // });
   
-      // Start the video call
-      // startVideoCall(roomID, ownUser.id, ownUser.username);}
-    };
+    //   // Start the video call
+    //   // startVideoCall(roomID, ownUser.id, ownUser.username);}
+    // };
   
   return (
     <div className="flex items-center justify-between p-4 bg-gray-800 text-white">

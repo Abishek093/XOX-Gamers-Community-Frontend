@@ -26,10 +26,10 @@ interface CommunityData {
   updatedAt: string;
 }
 
-interface FollowerCountUpdate {
-  communityId: string;
-  followerCount: number;
-}
+// interface FollowerCountUpdate {
+//   communityId: string;
+//   followerCount: number;
+// }
 
 const Community: React.FC = () => {
   const { communityId } = useParams<{ communityId: string }>();

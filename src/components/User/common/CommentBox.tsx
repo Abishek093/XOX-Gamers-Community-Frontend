@@ -7,8 +7,8 @@ import axiosInstance from '../../../services/userServices/axiosInstance';
 import { toast } from 'sonner';
 import * as Yup from 'yup';
 import CommentSection from './CommentSection';
-import { useAppSelector } from '../../../store/hooks';
-import { selectUser } from '../../../Slices/userSlice/userSlice';
+// import { useAppSelector } from '../../../store/hooks';
+// import { selectUser } from '../../../Slices/userSlice/userSlice';
 
 const commentSchema = Yup.object().shape({
   comment: Yup.string()
@@ -28,7 +28,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId, userId, onClose }) => {
   const [chosenEmoji, setChosenEmoji] = useState(false);
   const [value, setValue] = useState('');
   const [comments, setComments] = useState<any[]>([]);
-  const ownUser = useAppSelector(selectUser);
+  // const ownUser = useAppSelector(selectUser);
   
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const API_URL = import.meta.env.VITE_USER_API_URL;

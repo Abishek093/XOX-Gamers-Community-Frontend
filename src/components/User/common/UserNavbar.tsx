@@ -1,5 +1,5 @@
-import React from 'react';
-import { FaSearch, FaBell, FaUserCircle } from 'react-icons/fa';
+// import React from 'react';
+import {FaUserCircle } from 'react-icons/fa';
 import { useAppSelector } from '../../../store/hooks';
 import { selectUser } from '../../../Slices/userSlice/userSlice';
 

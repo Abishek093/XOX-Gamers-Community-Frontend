@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, ReactNode, FC } from 'react';
+import{ createContext, useState, useContext, ReactNode, FC } from 'react';
 
 interface LoadingContextProps {
   loading: boolean;

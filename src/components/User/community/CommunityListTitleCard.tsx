@@ -1,14 +1,14 @@
 import React from 'react'
 import { Button } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import CreateCommunityModal from './CreateCommunityModal';
+// import CreateCommunityModal from './CreateCommunityModal';
 
 interface CommunityListTitleCardPorps {
     isModalOpen : boolean
     setIsModalOpen : React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const CommunityListTitleCard: React.FC <CommunityListTitleCardPorps> = ({isModalOpen, setIsModalOpen}) => {
+const CommunityListTitleCard: React.FC <CommunityListTitleCardPorps> = ({ setIsModalOpen}) => {
     const titleImageUrl = 'https://img.freepik.com/free-vector/earth-view-night-from-alien-planet-neon-space_33099-1876.jpg?ga=GA1.1.1355158502.1721899147&semt=ais_hybrid'; // updated image link
   return (
     <div 

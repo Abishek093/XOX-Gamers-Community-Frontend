@@ -8,11 +8,10 @@ import { ICommunityWithCounts } from '../../interfaces/userInterfaces/apiInterfa
 import { useAppSelector } from '../../store/hooks';
 import { selectUser } from '../../Slices/userSlice/userSlice';
 import { useLoading } from '../../context/LoadingContext';
-
 const CommunityList: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [communities, setCommunities] = useState<ICommunityWithCounts[]>([]);
-  const [error, setError] = useState<string>('');
+  // const [error, setError] = useState<string>('');
   const { setLoading } = useLoading(); 
 
   const ownUser = useAppSelector(selectUser);
@@ -32,10 +31,11 @@ const CommunityList: React.FC = () => {
 
   const handleSubmit = async (communityName: string, description: string, postPermission: string, uploadedImage: string | null) => {
     if (!communityName || !description || !postPermission || !uploadedImage) {
-      setError('Please fill out all fields and upload an image');
+      toast.error('Please fill out all fields and upload an image')
+      // setError('Please fill out all fields and upload an image');
       return;
     }
-    setError('');
+    // setError('');
     setLoading(true); 
     try {
       setIsModalOpen(false);

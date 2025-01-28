@@ -243,10 +243,14 @@ const ImageCropper: React.FC<ImageCropperProps> = ({
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
 
-  const handleCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+  // const handleCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+  //   setCroppedAreaPixels(croppedAreaPixels);
+  // }, []);
+  const handleCropComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
+  
   const handleSave = useCallback(async () => {
     if (imageSrc && croppedAreaPixels) {
       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);

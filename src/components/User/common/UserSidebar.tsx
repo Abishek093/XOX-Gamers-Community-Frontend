@@ -9,12 +9,9 @@ import {
   FaUser,
   FaComments,
   FaUserFriends,
-  FaWallet,
   FaNewspaper,
   FaUsers,
-  FaStream,
-  FaRegFileAlt,
-  FaQuestionCircle,
+
   FaSignOutAlt,
   FaCog,
 } from 'react-icons/fa';
@@ -72,7 +69,7 @@ interface UserSidebarProps {
   iconsOnly: boolean;
 }
 
-const Sidebar: React.FC<UserSidebarProps> = ({ iconsOnly }) => {
+const Sidebar: React.FC<UserSidebarProps> = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();

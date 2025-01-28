@@ -49,7 +49,6 @@ const Profile: React.FC = () => {
   const [followStatus, setFollowStatus] = useState<
     "Rejected" | "NotFollowing" | "Requested" | "Accepted"
   >("NotFollowing");
-  const BACKEND_API_URL = import.meta.env.VITE_USER_API_URL;
   const API_URL = import.meta.env.VITE_USER_SERVICE_API_URL;
 
   const fetchUserProfile = useCallback(

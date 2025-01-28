@@ -1,9 +1,5 @@
-import { UserData, UserApiData, VerifyOtpPayload, VerifyOtpResponse, LoginPayload, LoginResponse, GoogleUser, AuthenticatedUser, RefreshTokenResponse, UpdateUserResponse, UpdateUser, ConfirmMailRequest, ConfirmMailResponse, verifyResetOtpResponse, UpdatePasswordRequest, UpdatePasswordResponse, ImageUploadValues, ImageUploadResponse } from '../../interfaces/userInterfaces/apiInterfaces';
+import { UserData, UserApiData, VerifyOtpPayload, VerifyOtpResponse, LoginPayload, LoginResponse, GoogleUser, AuthenticatedUser, RefreshTokenResponse, UpdateUserResponse, UpdateUser, ConfirmMailRequest, ConfirmMailResponse, verifyResetOtpResponse, UpdatePasswordRequest, UpdatePasswordResponse } from '../../interfaces/userInterfaces/apiInterfaces';
 import axiosInstance from './axiosInstance';
-
-
-const BACKEND_API_URL = import.meta.env.VITE_USER_API_URL;
-const API_URL = import.meta.env.VITE_USER_SERVICE_API_URL;
 
 export const signup = async (userDetails: UserApiData): Promise<UserData> => {
   try {

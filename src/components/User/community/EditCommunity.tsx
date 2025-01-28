@@ -83,7 +83,7 @@ const EditCommunity: React.FC<EditCommunityProps> = ({ community, onCommunityUpd
         return;
       }
 
-      const response = await axiosInstance.delete(`content/communities/delete-community/${community._id}`);
+      await axiosInstance.delete(`content/communities/delete-community/${community._id}`);
 
       toast.success('Community deleted successfully');
       navigate('/community-list')

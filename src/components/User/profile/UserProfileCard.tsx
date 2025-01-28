@@ -15,7 +15,7 @@ import {
   UserData,
   GoogleUser,
   UserDetails,
-  AspectRatio,
+  // AspectRatio,
 } from "../../../interfaces/userInterfaces/apiInterfaces";
 import ImageUploadModal from "../../Common/ImageUploadModal";
 import axiosInstance from "../../../services/userServices/axiosInstance";
@@ -55,14 +55,18 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
   const [localProfileImage, setLocalProfileImage] = useState(
     user?.profileImage || defaultProfileImage
   );
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>({
-    shape: "rect",
-    aspect: [700 / 400, 1020 / 400],
-  });
+  // const [aspectRatio, setAspectRatio] = useState<AspectRatio>({
+  //   shape: "rect",
+  //   aspect: [700 / 400, 1020 / 400],
+  // });
   const ownUser = useAppSelector(selectUser);
   const URL = import.meta.env.VITE_CONTENT_SERVICE_API_URL
   const navigate = useNavigate();
 
+  useEffect(() => {
+    setLocalProfileImage(user?.profileImage || defaultProfileImage);
+  }, [user?.profileImage]);
+  
   // const handlePostCreation = async (
   //   croppedImage: string,
   //   _isProfileImage?: boolean,
@@ -289,10 +293,10 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({
               fullWidth
               onClick={() => {
                 setIsModalOpen(true);
-                setAspectRatio({
-                  shape: "rect",
-                  aspect: [700 / 400, 1020 / 400],
-                });
+                // setAspectRatio({
+                //   shape: "rect",
+                //   aspect: [700 / 400, 1020 / 400],
+                // });
               }}
               sx={{ marginTop: 2 }}
             >

@@ -372,7 +372,7 @@
 // export default ExplorePage;
 
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import{ useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../../Slices/userSlice/userSlice';
 import Post from '../common/Post';
@@ -435,6 +435,19 @@ const ExplorePage = () => {
 
   const currentState = activeTab === 'explore' ? exploreState : forYouState;
   const setCurrentState = activeTab === 'explore' ? setExploreState : setForYouState;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 500);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
 
   const fetchPosts = useCallback(async (
     type: 'explore' | 'forYou',

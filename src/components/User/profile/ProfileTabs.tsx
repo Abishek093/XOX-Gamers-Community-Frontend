@@ -40,7 +40,7 @@
 
 // export default ProfileTabs;
 import React, { useState } from 'react';
-import { FaFileImage, FaGamepad, FaUserFriends, FaInfo } from 'react-icons/fa';
+import { FaFileImage, FaInfo } from 'react-icons/fa';
 
 interface ProfileTabsProps {
   setActiveTab: (tab: 'posts' | 'info' | 'friends' | 'groups') => void;
