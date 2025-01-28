@@ -53,8 +53,8 @@ const Login: React.FC = () => {
           username: user.displayName!,
           profileImage: user.photoURL!,
         };
-        console.log("googleLoginDetails in login page:",googleLoginDetails);
-        
+        console.log("googleLoginDetails in login page:", googleLoginDetails);
+
         dispatch(googleAuth(googleLoginDetails))
           .unwrap()
           .then(() => {
@@ -75,7 +75,10 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100" style={{ backgroundImage: "url('https://pro-theme.com/html/teamhost/assets/img/heading8.jpg')" }}>
+    <div
+      className="min-h-screen flex items-center justify-center bg-gray-100 bg-no-repeat bg-cover bg-center"
+      style={{ backgroundImage: "url('https://pro-theme.com/html/teamhost/assets/img/heading8.jpg')" }}
+    >
       <div className="bg-zinc-900 p-6 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-white text-2xl font-bold mb-4">Login</h2>
         <Formik
