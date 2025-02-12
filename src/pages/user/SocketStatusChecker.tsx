@@ -1,13 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useSockets } from '../../../src/context/socketContext'; 
+// import { Socket } from 'socket.io-client';
 
 const SocketStatusChecker: React.FC = () => {
-  const { userSocket, streamSocket, connectSockets } = useSockets();
+  const { userSocket, streamSocket, contentSocket, connectSockets } = useSockets();
   const [userSocketStatus, setUserSocketStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [streamSocketStatus, setStreamSocketStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
-
+  const [contentSocketStatus, setContentSocketStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   useEffect(() => {
     if (!userSocket || !streamSocket) {
+      connectSockets();
+    }
+  
+    const handleError = (_:any, namespace: string) => (error: Error) => {
+      console.error(`${namespace} socket error:`, {
+        message: error.message,
+        stack: error.stack,
+        type: error.name
+      });
+    };
+  
+    userSocket?.on('error', handleError(userSocket, 'User'));
+    streamSocket?.on('error', handleError(streamSocket, 'Stream'));
+    contentSocket?.on('error', handleError(contentSocket, 'Stream'));
+
+  }, [userSocket, streamSocket, contentSocket, connectSockets]);
+
+
+  useEffect(() => {
+    if (!userSocket || !streamSocket || !contentSocket) {
       connectSockets();
     }
 
@@ -27,6 +48,14 @@ const SocketStatusChecker: React.FC = () => {
       }
     };
 
+    const checkContentSocketStatus = () => {
+      if (contentSocket?.connected) {
+        setContentSocketStatus('connected');
+      } else {
+        setContentSocketStatus('disconnected');
+      }
+    };
+
     // Initial check
     checkUserSocketStatus();
     checkStreamSocketStatus();
@@ -38,22 +67,31 @@ const SocketStatusChecker: React.FC = () => {
     streamSocket?.on('connect', checkStreamSocketStatus);
     streamSocket?.on('disconnect', checkStreamSocketStatus);
 
+    contentSocket?.on('connect', checkContentSocketStatus);
+    contentSocket?.on('disconnect', checkContentSocketStatus);
+
     // Periodic status checks
     const statusCheckInterval = setInterval(() => {
       checkUserSocketStatus();
       checkStreamSocketStatus();
+      checkContentSocketStatus()
     }, 5000); // Check every 5 seconds
 
     // Test socket communication
     const testSocketCommunication = () => {
       // User socket test
-      userSocket?.emit('create_chat', { 
+      userSocket?.emit('join_user', { 
         type: 'connectivity_test', 
         timestamp: new Date().toISOString() 
       });
 
       // Streaming socket test
-      streamSocket?.emit('send_comment', { 
+      streamSocket?.emit('join_stream', { 
+        type: 'connectivity_test', 
+        timestamp: new Date().toISOString() 
+      });
+
+      streamSocket?.emit('join_post', { 
         type: 'connectivity_test', 
         timestamp: new Date().toISOString() 
       });
@@ -75,8 +113,11 @@ const SocketStatusChecker: React.FC = () => {
 
       streamSocket?.off('connect', checkStreamSocketStatus);
       streamSocket?.off('disconnect', checkStreamSocketStatus);
+
+      contentSocket?.off('connect', checkContentSocketStatus);
+      contentSocket?.off('disconnect', checkContentSocketStatus);
     };
-  }, [userSocket, streamSocket, connectSockets]);
+  }, [userSocket, streamSocket, contentSocket,  connectSockets]);
 
   const getStatusColor = (status: 'connecting' | 'connected' | 'disconnected') => {
     switch (status) {
@@ -106,6 +147,13 @@ const SocketStatusChecker: React.FC = () => {
           <h3 className="font-semibold">Streaming Socket</h3>
           <p className={`font-medium ${getStatusColor(streamSocketStatus)}`}>
             Status: {streamSocketStatus.charAt(0).toUpperCase() + streamSocketStatus.slice(1)}
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold">Streaming Socket</h3>
+          <p className={`font-medium ${getStatusColor(contentSocketStatus)}`}>
+            Status: {contentSocketStatus.charAt(0).toUpperCase() + contentSocketStatus.slice(1)}
           </p>
         </div>
 

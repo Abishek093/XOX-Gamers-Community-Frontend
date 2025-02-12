@@ -83,10 +83,16 @@ import { refreshAccessToken } from './api';
 import { logout } from '../../../src/Slices/userSlice/userSlice';
 import { store } from '../../../src/store';
 
+// const axiosInstance = axios.create({
+//   baseURL: 'http://localhost:3001/api/',
+//   withCredentials: true,
+// });
+
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3001/api/',
+  baseURL: 'http://localhost:8000/api/',
   withCredentials: true,
 });
+
 
 axiosInstance.interceptors.request.use(
   (config) => {
