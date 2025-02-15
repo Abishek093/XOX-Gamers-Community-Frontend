@@ -4,7 +4,8 @@ import { refreshAccessToken } from './api';
 import { useNavigate } from 'react-router-dom';
 
 const axiosInstanceChat = axios.create({
-  baseURL: 'http://localhost:5001/chat/',
+  // baseURL: 'http://localhost:5001/chat/',
+  baseURL: 'https://xoxgaming.shop/chat/',
 });
 
 axiosInstanceChat.interceptors.request.use(
