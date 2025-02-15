@@ -112,22 +112,22 @@ interface GuidelineStep {
 
 const guidelines: GuidelineStep[] = [
   {
-    image: 'public/step 1.jpeg',
+    image: 'https://gamers-community.s3.us-east-1.amazonaws.com/step+1.jpeg',
     text: 'Open OBS Settings',
     description: 'Navigate to Settings in OBS Studio by clicking the Settings button in the controls panel.',
   },
   {
-    image: 'public/step 2.jpeg',
+    image: 'https://gamers-community.s3.us-east-1.amazonaws.com/step+2.jpeg',
     text: 'Select Stream Service',
     description: 'In the Settings window, select "Stream" from the left sidebar and choose "Custom" from the service dropdown.',
   },
   {
-    image: 'public/step 3.jpeg',
+    image: 'https://gamers-community.s3.us-east-1.amazonaws.com/step+3.jpeg',
     text: 'Enter Stream Server',
     description: 'Copy the server URL provided below and paste it into the "Server" field in OBS.',
   },
   {
-    image: 'public/step 4.jpeg',
+    image: 'https://gamers-community.s3.us-east-1.amazonaws.com/step+4.jpeg',
     text: 'Set Stream Key',
     description: 'Copy your unique stream key provided below and paste it into the "Stream Key" field. Keep this key private.',
   },
