@@ -89,8 +89,8 @@ import { store } from '../../../src/store';
 // });
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000/api/',
-  // baseURL: 'https://xoxgaming.shop/api/',
+  // baseURL: 'http://localhost:8000/api/',
+  baseURL: 'https://xoxgaming.shop/api/',
   withCredentials: true,
 });
 
