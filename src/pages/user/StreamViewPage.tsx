@@ -156,6 +156,7 @@ const StreamViewPage: React.FC = () => {
   const [followStatus, setFollowStatus] = useState<
     "Rejected" | "NotFollowing" | "Requested" | "Accepted"
   >("NotFollowing");
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   const scrollToBottom = () => {
     commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -165,9 +166,53 @@ const StreamViewPage: React.FC = () => {
     scrollToBottom();
   }, [comments]);
 
+  // useEffect(() => {
+  //   const joinStream = () => {
+  //     if (streamSocket && streamId && ownUser?.id) {
+  //       streamSocket.emit('join_stream', {
+  //         streamId,
+  //         userId: ownUser.id
+  //       });
+  //     }
+  //   };
+
+  //   const leaveStream = () => {
+  //     if (streamSocket && streamId && ownUser?.id) {
+  //       streamSocket.emit('leave_stream', {
+  //         streamId,
+  //         userId: ownUser.id
+  //       });
+  //     }
+  //   };
+
+  //   if (streamSocket) {
+  //     streamSocket.on('viewer_update', (data: ViewerUpdateData) => {
+  //       if (data.streamId === streamId) {
+  //         setViewerCount(data.viewerCount);
+  //       }
+  //     });
+  //   }
+
+  //   joinStream();
+
+  //   const handleBeforeUnload = () => {
+  //     leaveStream();
+  //   };
+  //   window.addEventListener('beforeunload', handleBeforeUnload);
+
+  //   return () => {
+  //     leaveStream();
+  //     window.removeEventListener('beforeunload', handleBeforeUnload);
+  //     if (streamSocket) {
+  //       streamSocket.off('viewer_update');
+  //     }
+  //   };
+  // }, [streamSocket, streamId, ownUser?.id]);
+
   useEffect(() => {
     const joinStream = () => {
       if (streamSocket && streamId && ownUser?.id) {
+        console.log('Joining stream:', streamId, 'User:', ownUser.id);
         streamSocket.emit('join_stream', {
           streamId,
           userId: ownUser.id
@@ -177,6 +222,7 @@ const StreamViewPage: React.FC = () => {
 
     const leaveStream = () => {
       if (streamSocket && streamId && ownUser?.id) {
+        console.log('Leaving stream:', streamId, 'User:', ownUser.id);
         streamSocket.emit('leave_stream', {
           streamId,
           userId: ownUser.id
@@ -185,28 +231,44 @@ const StreamViewPage: React.FC = () => {
     };
 
     if (streamSocket) {
+      // Handle socket connection events
+      streamSocket.on('connect', () => {
+        console.log('Socket connected');
+        setIsSocketConnected(true);
+        joinStream(); // Join stream when socket connects
+      });
+
+      streamSocket.on('disconnect', () => {
+        console.log('Socket disconnected');
+        setIsSocketConnected(false);
+      });
+
+      // Handle viewer count updates
       streamSocket.on('viewer_update', (data: ViewerUpdateData) => {
+        console.log('Received viewer update:', data);
         if (data.streamId === streamId) {
           setViewerCount(data.viewerCount);
         }
       });
+
+      // If socket is already connected, join immediately
+      if (streamSocket.connected) {
+        setIsSocketConnected(true);
+        joinStream();
+      }
     }
 
-    joinStream();
-
-    const handleBeforeUnload = () => {
-      leaveStream();
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
+    // Cleanup function
     return () => {
-      leaveStream();
-      window.removeEventListener('beforeunload', handleBeforeUnload);
       if (streamSocket) {
+        leaveStream();
+        streamSocket.off('connect');
+        streamSocket.off('disconnect');
         streamSocket.off('viewer_update');
       }
     };
   }, [streamSocket, streamId, ownUser?.id]);
+
 
   useEffect(() => {
     if (streamSocket && streamId) {
@@ -245,6 +307,90 @@ const StreamViewPage: React.FC = () => {
     }
   }, [streamSocket, streamId]);
 
+  // useEffect(() => {
+  //   const fetchStreamAndReaction = async () => {
+  //     try {
+  //       setLoading(true);
+  //       setIsLoading(true);
+
+  //       // Fetch stream data
+  //       const [streamResponse, reactionResponse] = await Promise.all([
+  //         axiosInstance.get(`streaming/get-steam-key/${streamId}`),
+  //         ownUser?.id ? axiosInstance.get(`streaming/reaction/${ownUser.id}/${streamId}`) : null
+  //       ]);
+  //       console.log('Reaction Response:', reactionResponse);
+  //       const fetchedStreamData: StreamDto = {
+  //         ...streamResponse.data,
+  //         user: {
+  //           ...streamResponse.data.user,
+  //           profileImage: streamResponse.data.user.profileImage || '/api/placeholder/100/100'
+  //         },
+  //         status: streamResponse.data.status || {
+  //           likes: 0,
+  //           dislikes: 0,
+  //           views: 0
+  //         }
+  //       };
+  //       console.log("streamResponse", streamResponse)
+  //       setStreamKey(streamResponse.data.streamKey)
+  //       setStreamData(fetchedStreamData);
+
+  //       if (reactionResponse?.data) {
+  //         const currentReaction = reactionResponse.data;
+  //         setUserReaction(currentReaction);
+  //         setIsLiked(currentReaction === 'like');
+  //         setIsDisliked(currentReaction === 'dislike');
+  //       } else {
+  //         // Reset reaction states if no reaction data
+  //         setUserReaction(null);
+  //         setIsLiked(false);
+  //         setIsDisliked(false);
+  //       }
+
+  //       const commentsResponse = await axiosInstance.get(`streaming/get-stream-comments/${streamId}`);
+  //       console.log("commentsResponse.data", commentsResponse.data)
+  //       const fetchedComments: CommentType[] = commentsResponse.data
+  //         .sort((a: CommentType, b: CommentType) =>
+  //           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  //         );
+
+  //       setComments((prevComments) => {
+  //         const commentMap = new Map(prevComments.map((c) => [c.timestamp, c]));
+  //         fetchedComments.forEach((comment) => {
+  //           if (!commentMap.has(comment.timestamp)) {
+  //             commentMap.set(comment.timestamp, comment);
+  //           }
+  //         });
+
+  //         return Array.from(commentMap.values())
+  //           .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  //       });
+  //       setError(null);
+
+  //       if (streamResponse.data.user.id) {
+  //         const followStatusResult = await axiosInstance.get(
+  //           `user/followerStatus/${ownUser?.id}/user/${streamResponse.data.user.id}`
+  //         );
+  //         console.log("followStatusResult", followStatusResult)
+  //         setFollowStatus(followStatusResult.data.status);
+  //       } else {
+  //         console.log("User id not present")
+  //       }
+  //     } catch (error) {
+  //       console.error('Stream fetch error:', error);
+  //       setError('Failed to load stream. Please try again later.');
+  //       toast.error('Failed to show the stream');
+  //     } finally {
+  //       setLoading(false);
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   if (streamId) {
+  //     fetchStreamAndReaction();
+  //   }
+  // }, [streamId, ownUser?.id, setLoading]);
+
   useEffect(() => {
     const fetchStreamAndReaction = async () => {
       try {
@@ -272,6 +418,13 @@ const StreamViewPage: React.FC = () => {
         console.log("streamResponse", streamResponse)
         setStreamKey(streamResponse.data.streamKey)
         setStreamData(fetchedStreamData);
+
+        if (streamResponse.data.viewerCount) {
+          setViewerCount({
+            currentViewers: streamResponse.data.viewerCount.currentViewers || 0,
+            totalUniqueViewers: streamResponse.data.viewerCount.totalUniqueViewers || 0
+          });
+        }
 
         if (reactionResponse?.data) {
           const currentReaction = reactionResponse.data;
@@ -328,8 +481,6 @@ const StreamViewPage: React.FC = () => {
       fetchStreamAndReaction();
     }
   }, [streamId, ownUser?.id, setLoading]);
-
-
 
   const handleFollow = async () => {
     try {
@@ -700,13 +851,22 @@ const StreamViewPage: React.FC = () => {
                   {streamData.status?.dislikes || 0}
                 </button>
               </div>
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <p className="text-gray-500">
                   {viewerCount.currentViewers.toLocaleString()} watching now
                 </p>
-                {/* <p className="text-gray-500">
+                <p className="text-gray-500">
                   {viewerCount.totalUniqueViewers.toLocaleString()} total viewers
-                </p> */}
+                </p>
+              </div> */}
+              <div className="flex items-center space-x-4">
+                <p className="text-gray-500">
+                  {isSocketConnected ? (
+                    `${viewerCount.currentViewers.toLocaleString()} watching now`
+                  ) : (
+                    'Connecting...'
+                  )}
+                </p>
               </div>
             </div>
           </div>

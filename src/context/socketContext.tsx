@@ -294,34 +294,6 @@
 // };
 
 
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
-import Cookies from 'js-cookie';
-import { useAppSelector } from "../store/hooks";
-import { selectUser } from "../Slices/userSlice/userSlice";
-import { refreshAccessToken } from "../services/userServices/api";
-
-interface SocketContextType {
-    userSocket: Socket | null;
-    streamSocket: Socket | null;
-    contentSocket: Socket | null;
-    connectSockets: () => void;
-}
-
-const SocketContext = createContext<SocketContextType>({
-    userSocket: null,
-    streamSocket: null,
-    contentSocket: null,
-    connectSockets: () => { }
-});
-
-export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [userSocket, setUserSocket] = useState<Socket | null>(null);
-    const [streamSocket, setStreamSocket] = useState<Socket | null>(null);
-    const [contentSocket, setContentSocket] = useState<Socket | null>(null);
-
-    const user = useAppSelector(selectUser);
-
     // const connectSockets = async () => {
     //     if (userSocket) userSocket.disconnect();
     //     if (streamSocket) streamSocket.disconnect();
@@ -437,6 +409,39 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     //     setStreamSocket(streamSocketInstance);
     //     setContentSocket(contentSocketInstance);
     // };
+
+
+    
+
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import Cookies from 'js-cookie';
+import { useAppSelector } from "../store/hooks";
+import { selectUser } from "../Slices/userSlice/userSlice";
+import { refreshAccessToken } from "../services/userServices/api";
+
+interface SocketContextType {
+    userSocket: Socket | null;
+    streamSocket: Socket | null;
+    contentSocket: Socket | null;
+    connectSockets: () => void;
+}
+
+const SocketContext = createContext<SocketContextType>({
+    userSocket: null,
+    streamSocket: null,
+    contentSocket: null,
+    connectSockets: () => { }
+});
+
+export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [userSocket, setUserSocket] = useState<Socket | null>(null);
+    const [streamSocket, setStreamSocket] = useState<Socket | null>(null);
+    const [contentSocket, setContentSocket] = useState<Socket | null>(null);
+
+    const user = useAppSelector(selectUser);
+
+
 
     const connectSockets = async () => {
         if (userSocket) userSocket.disconnect();

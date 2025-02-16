@@ -2451,3 +2451,61 @@
   //     userSocket.off("messageSeen");
   //   };
   // }, [userSocket, handleNewMessage]);
+++++++++++++++++++++
+
+
+
+  // const handleSendComment = () => {
+  //   if (newComment.trim() && streamSocket && ownUser && ownUser.id) {
+  //     const commentToAdd: CommentType = {
+  //       streamId: streamId,
+  //       user: {
+  //         userId: ownUser.id,
+  //         displayName: ownUser.displayName,
+  //         profileImage: ownUser.profileImage
+  //       },
+  //       comment: newComment,
+  //       timestamp: new Date().toISOString(),
+  //       error: false
+  //     };
+
+  //     // Add comment to the end of the list
+  //     setComments((prevComments) => {
+  //       const updatedComments = [...prevComments, commentToAdd]
+  //         .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  //       return updatedComments;
+  //     });
+  //     setNewComment('');
+
+  //     try {
+  //       streamSocket.emit('send_comment', commentToAdd, (response: CommentSocketResponse) => {
+  //         if (!response || !response.success) {
+  //           setComments((prevComments) =>
+  //             prevComments.map((comment) =>
+  //               comment.timestamp === commentToAdd.timestamp
+  //                 ? { ...comment, error: true }
+  //                 : comment
+  //             )
+  //           );
+  //           toast.error('Failed to send comment');
+  //         }
+  //       });
+  //     } catch (error) {
+  //       console.error('Error sending comment:', error);
+  //       setComments((prevComments) =>
+  //         prevComments.map((comment) =>
+  //           comment.timestamp === commentToAdd.timestamp
+  //             ? { ...comment, error: true }
+  //             : comment
+  //         )
+  //       );
+  //       toast.error('Failed to send comment');
+  //     }
+  //   }
+  // };
+      // Add comment optimistically
+      // setComments((prevComments) => {
+      //   const updatedComments = [...prevComments, commentToAdd]
+      //     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      //   return updatedComments;
+      // });
