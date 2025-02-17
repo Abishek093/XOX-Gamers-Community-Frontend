@@ -61,6 +61,22 @@ import { useLoading } from '../../context/LoadingContext';
 //   error?: boolean;
 // }
 
+interface JoinNotification extends CommentType {
+  type: 'join';
+}
+
+interface StreamJoinNotification {
+  streamId: string;
+  user: {
+    userId: string;
+    displayName: string;
+    profileImage: string;
+  };
+  timestamp: string;
+  type: 'join';
+}
+
+
 interface UserDto {
   id: string;
   username: string;
@@ -170,6 +186,7 @@ const Live = () => {
   const [isSetupComplete, setIsSetupComplete] = useState(false);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [newComment, setNewComment] = useState('');
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
 
   const API_URL = import.meta.env.VITE_STREAMING_SERVICE_API_URL;
   const ownUser = useAppSelector(selectUser);
@@ -183,9 +200,52 @@ const Live = () => {
   const [userReaction, setUserReaction] = useState<ReactionType>(null);
 
 
+  // useEffect(() => {
+  //   if (streamSocket && streamData.id) {
+  //     // Viewer update listener
+  //     streamSocket.on('viewer_update', (data: {
+  //       streamId: string;
+  //       viewerCount: ViewerCount
+  //     }) => {
+  //       if (data.streamId === streamData.id) {
+  //         setViewerCount(data.viewerCount);
+  //       }
+  //     });
+
+  //     // Reaction update listener
+  //     streamSocket.on('reaction_update', (data: {
+  //       streamId: string;
+  //       status: StreamDto['status']
+  //     }) => {
+  //       if (data.streamId === streamData.id) {
+  //         setStreamData(prevData => ({
+  //           ...prevData,
+  //           status: data.status
+  //         }));
+  //       }
+  //     });
+
+  //     return () => {
+  //       streamSocket.off('viewer_update');
+  //       streamSocket.off('reaction_update');
+  //     };
+  //   }
+  // }, [streamSocket, streamData.id]);
+
   useEffect(() => {
     if (streamSocket && streamData.id) {
-      // Viewer update listener
+      // Handle socket connection status
+      streamSocket.on('connect', () => {
+        console.log('Socket connected');
+        setIsSocketConnected(true);
+      });
+
+      streamSocket.on('disconnect', () => {
+        console.log('Socket disconnected');
+        setIsSocketConnected(false);
+      });
+
+      // Handle viewer updates
       streamSocket.on('viewer_update', (data: {
         streamId: string;
         viewerCount: ViewerCount
@@ -195,7 +255,7 @@ const Live = () => {
         }
       });
 
-      // Reaction update listener
+      // Handle reaction updates
       streamSocket.on('reaction_update', (data: {
         streamId: string;
         status: StreamDto['status']
@@ -208,13 +268,132 @@ const Live = () => {
         }
       });
 
+      // Handle new comments and join notifications
+      streamSocket.on('new_comment', (commentData: CommentType) => {
+        if (commentData.streamId === streamData.id) {
+          setComments(prevComments => {
+            const newComments = [...prevComments, commentData]
+              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+            return newComments;
+          });
+        }
+      });
+
+      streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
+        console.log('Received join notification:', joinData);
+
+        const notification: JoinNotification = {
+          streamId: joinData.streamId,
+          user: {
+            userId: joinData.user.userId,
+            displayName: joinData.user.displayName,
+            profileImage: joinData.user.profileImage
+          },
+          comment: `${joinData.user.displayName} joined the stream`,
+          timestamp: joinData.timestamp,
+          type: 'join'
+        };
+
+        setComments(prevComments => {
+          const newComments = [...prevComments, notification].sort(
+            (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          );
+          return newComments;
+        });
+      });
+
       return () => {
+        streamSocket.off('connect');
+        streamSocket.off('disconnect');
         streamSocket.off('viewer_update');
         streamSocket.off('reaction_update');
+        streamSocket.off('new_comment');
+        streamSocket.off('user_joined_stream');
       };
     }
   }, [streamSocket, streamData.id]);
 
+  // const handleReaction = async (action: 'like' | 'dislike') => {
+  //   if (!ownUser?.id || !streamData.id) return;
+
+  //   let newAction: 'like' | 'dislike' | 'remove';
+  //   let previousReaction: ReactionType = userReaction;
+  //   const previousStatus = { ...streamData.status! };
+
+  //   try {
+  //     // Optimistic update
+  //     if (action === 'like') {
+  //       newAction = isLiked ? 'remove' : 'like';
+  //       setIsLiked(!isLiked);
+  //       if (isDisliked) {
+  //         setIsDisliked(false);
+  //       }
+  //     } else {
+  //       newAction = isDisliked ? 'remove' : 'dislike';
+  //       setIsDisliked(!isDisliked);
+  //       if (isLiked) {
+  //         setIsLiked(false);
+  //       }
+  //     }
+  //     setUserReaction(newAction === 'remove' ? null : newAction);
+
+  //     // Update status optimistically
+  //     setStreamData(prev => {
+  //       const newStatus = { ...prev.status! };
+  //       if (previousReaction) {
+  //         if (previousReaction === 'like') {
+  //           newStatus.likes = Math.max(0, newStatus.likes - 1);
+  //         } else if (previousReaction === 'dislike') {
+  //           newStatus.dislikes = Math.max(0, newStatus.dislikes - 1);
+  //         }
+  //       }
+  //       if (newAction !== 'remove') {
+  //         if (newAction === 'like') {
+  //           newStatus.likes += 1;
+  //         } else if (newAction === 'dislike') {
+  //           newStatus.dislikes += 1;
+  //         }
+  //       }
+  //       return { ...prev, status: newStatus };
+  //     });
+
+  //     // Server request
+  //     const response = await axiosInstance.post<{
+  //       success: boolean;
+  //       status: StreamDto['status'];
+  //       userReaction: ReactionType;
+  //     }>('streaming/reaction', {
+  //       userId: ownUser.id,
+  //       streamId: streamData.id,
+  //       action: newAction
+  //     });
+
+  //     // Update with actual server data
+  //     if (response.data.success) {
+  //       setStreamData(prev => ({
+  //         ...prev,
+  //         status: response.data.status
+  //       }));
+  //       setUserReaction(response.data.userReaction);
+  //       setIsLiked(response.data.userReaction === 'like');
+  //       setIsDisliked(response.data.userReaction === 'dislike');
+  //     } else {
+  //       throw new Error('Failed to update reaction');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error handling reaction:', error);
+  //     toast.error('Failed to update reaction');
+
+  //     // Revert all changes on error
+  //     setIsLiked(previousReaction === 'like');
+  //     setIsDisliked(previousReaction === 'dislike');
+  //     setStreamData(prev => ({
+  //       ...prev,
+  //       status: previousStatus
+  //     }));
+  //     setUserReaction(previousReaction);
+  //   }
+  // };
   const handleReaction = async (action: 'like' | 'dislike') => {
     if (!ownUser?.id || !streamData.id) return;
 
@@ -223,7 +402,6 @@ const Live = () => {
     const previousStatus = { ...streamData.status! };
 
     try {
-      // Optimistic update
       if (action === 'like') {
         newAction = isLiked ? 'remove' : 'like';
         setIsLiked(!isLiked);
@@ -239,7 +417,6 @@ const Live = () => {
       }
       setUserReaction(newAction === 'remove' ? null : newAction);
 
-      // Update status optimistically
       setStreamData(prev => {
         const newStatus = { ...prev.status! };
         if (previousReaction) {
@@ -259,7 +436,6 @@ const Live = () => {
         return { ...prev, status: newStatus };
       });
 
-      // Server request
       const response = await axiosInstance.post<{
         success: boolean;
         status: StreamDto['status'];
@@ -270,7 +446,6 @@ const Live = () => {
         action: newAction
       });
 
-      // Update with actual server data
       if (response.data.success) {
         setStreamData(prev => ({
           ...prev,
@@ -286,7 +461,6 @@ const Live = () => {
       console.error('Error handling reaction:', error);
       toast.error('Failed to update reaction');
 
-      // Revert all changes on error
       setIsLiked(previousReaction === 'like');
       setIsDisliked(previousReaction === 'dislike');
       setStreamData(prev => ({
@@ -296,7 +470,6 @@ const Live = () => {
       setUserReaction(previousReaction);
     }
   };
-
 
   useEffect(() => {
     if (streamSocket && streamData.id) {
@@ -504,13 +677,44 @@ const Live = () => {
     }
   };
 
-  const handleSendComment = () => {
+  // const handleSendComment = () => {
 
-    if (newComment.trim() && streamSocket && ownUser && streamData.id) {
+  //   if (newComment.trim() && streamSocket && ownUser && streamData.id) {
+  //     const commentToAdd: CommentType = {
+  //       streamId: streamData.id,
+  //       user: {
+  //         userId: ownUser.id || 'Unknown User',
+  //         displayName: ownUser.displayName,
+  //         profileImage: ownUser.profileImage
+  //       },
+  //       comment: newComment,
+  //       timestamp: new Date().toISOString(),
+  //       error: false
+  //     };
+
+  //     setComments(prevComments => [...prevComments, commentToAdd]);
+  //     setNewComment('');
+
+  //     streamSocket.emit('send_comment', commentToAdd, (response: { success: boolean }) => {
+  //       if (!response.success) {
+  //         setComments(prevComments =>
+  //           prevComments.map(comment =>
+  //             comment.timestamp === commentToAdd.timestamp
+  //               ? { ...comment, error: true }
+  //               : comment
+  //           )
+  //         );
+  //         toast.error('Failed to send comment');
+  //       }
+  //     });
+  //   }
+  // };
+  const handleSendComment = () => {
+    if (newComment.trim() && streamSocket && ownUser && ownUser.id && streamData.id) {
       const commentToAdd: CommentType = {
         streamId: streamData.id,
         user: {
-          userId: ownUser.id || 'Unknown User',
+          userId: ownUser.id,
           displayName: ownUser.displayName,
           profileImage: ownUser.profileImage
         },
@@ -541,6 +745,55 @@ const Live = () => {
     setIsSetupComplete(true);
     setGuidelineModal(false);
   };
+
+
+  const renderComments = () => (
+    <div className="flex-grow overflow-y-auto space-y-4 pr-2">
+      {comments.map((comment, index) => (
+        <div key={index} className="flex items-start space-x-3 relative">
+          <img
+            src={comment.user.profileImage || '/api/placeholder/100/100'}
+            alt={comment.user.displayName}
+            className="w-8 h-8 rounded-full"
+          />
+          <div className="flex-grow">
+            <div className="flex items-center space-x-2">
+              <span className="font-semibold text-sm text-white">
+                {comment.user.displayName}
+              </span>
+              <span className="text-xs text-gray-400">
+                {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+              </span>
+            </div>
+            <p className={`${(comment as JoinNotification).type === 'join'
+              ? 'text-purple-400 italic'
+              : 'text-gray-300'
+              } text-sm ${comment.error ? 'text-red-500' : ''}`}>
+              {comment.comment}
+            </p>
+          </div>
+          {comment.error && (
+            <div className="absolute -top-1 -right-8 text-red-500">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+          )}
+        </div>
+      ))}
+      <div ref={commentsEndRef} />
+    </div>
+  );
+
+
+  const renderViewerCount = () => (
+    <div className="flex items-center space-x-2">
+      <Users className="h-5 w-5 text-gray-400" />
+      <span className="text-gray-300">
+        {isSocketConnected
+          ? `${viewerCount.currentViewers.toLocaleString()} watching now`
+          : 'Connecting...'}
+      </span>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-white text-white">
@@ -735,7 +988,7 @@ const Live = () => {
             </div>
 
             {/* Stream Info */}
-            <div className="bg-gray-800 shadow-xl rounded-lg p-6 border border-gray-700">
+            {/* <div className="bg-gray-800 shadow-xl rounded-lg p-6 border border-gray-700">
               <h2 className="text-lg font-medium text-white mb-4">Stream Info</h2>
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-sm text-gray-300">
@@ -758,15 +1011,35 @@ const Live = () => {
                       <ThumbsDown className="h-5 w-5 mr-2" />
                       {streamData.status?.dislikes || 0}
                     </button>
-                  </div>
+                  </div> */}
+
+            <div className="bg-gray-800 shadow-xl rounded-lg p-6 border border-gray-700">
+              <h2 className="text-lg font-medium text-white mb-4">Stream Info</h2>
+              <div className="space-y-4">
+                {renderViewerCount()}
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => handleReaction('like')}
+                    className={`flex items-center transition ${isLiked ? 'text-red-600' : 'text-gray-600 hover:text-gray-800'}`}
+                  >
+                    <ThumbsUp className="h-5 w-5 mr-2" />
+                    {streamData.status?.likes || 0}
+                  </button>
+                  <button
+                    onClick={() => handleReaction('dislike')}
+                    className={`flex items-center transition ${isDisliked ? 'text-red-600' : 'text-gray-600 hover:text-gray-800'}`}
+                  >
+                    <ThumbsDown className="h-5 w-5 mr-2" />
+                    {streamData.status?.dislikes || 0}
+                  </button>
                 </div>
                 <div className="space-y-2">
                   <button
                     onClick={handleStartStream}
                     disabled={streamData.isLive}
                     className={`w-full py-3 ${streamData.isLive
-                        ? 'bg-gray-600 cursor-not-allowed'
-                        : 'bg-red-600 hover:bg-red-700'
+                      ? 'bg-gray-600 cursor-not-allowed'
+                      : 'bg-red-600 hover:bg-red-700'
                       } text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center space-x-2`}
                   >
                     <Camera className="h-5 w-5" />
@@ -787,6 +1060,70 @@ const Live = () => {
             </div>
 
             {/* Live Chat */}
+            {/* {streamData.isLive && (
+            <div className="bg-gray-800 shadow-xl rounded-lg p-6 border border-gray-700">
+              <div className="flex items-center mb-4">
+                <MessageCircle className="w-6 h-6 mr-2 text-red-500" />
+                <h3 className="text-xl font-semibold text-white">
+                  Live Chat ({comments.length})
+                </h3>
+              </div>
+
+              <div className="h-[400px] flex flex-col">
+                <div className="flex-grow overflow-y-auto space-y-4 pr-2">
+                  {comments.map((comment, index) => (
+                    <div key={index} className="flex items-start space-x-3 relative">
+                      <img
+                        src={comment.user.profileImage || '/api/placeholder/100/100'}
+                        alt={comment.user.displayName}
+                        className="w-8 h-8 rounded-full"
+                      />
+                      <div className="flex-grow">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-semibold text-sm text-white">
+                            {comment.user.displayName}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+                          </span>
+                        </div>
+                        <p className={`text-gray-300 text-sm ${comment.error ? 'text-red-500' : ''}`}>
+                          {comment.comment}
+                        </p>
+                      </div>
+                      {comment.error && (
+                        <div className="absolute -top-1 -right-8 text-red-500">
+                          <AlertTriangle className="w-5 h-5" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <div ref={commentsEndRef} />
+                </div>
+
+                <div className="mt-4 border-t border-gray-700 pt-4">
+                  <div className="flex items-center space-x-2">
+                    <UserCircle2 className="w-10 h-10 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Write a comment..."
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
+                      className="flex-grow bg-gray-700 rounded-full px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    />
+                    <button
+                      onClick={handleSendComment}
+                      className="bg-red-600 text-white rounded-full p-2 hover:bg-red-700 transition"
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )} */}
+
             {streamData.isLive && (
               <div className="bg-gray-800 shadow-xl rounded-lg p-6 border border-gray-700">
                 <div className="flex items-center mb-4">
@@ -797,36 +1134,7 @@ const Live = () => {
                 </div>
 
                 <div className="h-[400px] flex flex-col">
-                  <div className="flex-grow overflow-y-auto space-y-4 pr-2">
-                    {comments.map((comment, index) => (
-                      <div key={index} className="flex items-start space-x-3 relative">
-                        <img
-                          src={comment.user.profileImage || '/api/placeholder/100/100'}
-                          alt={comment.user.displayName}
-                          className="w-8 h-8 rounded-full"
-                        />
-                        <div className="flex-grow">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-semibold text-sm text-white">
-                              {comment.user.displayName}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
-                            </span>
-                          </div>
-                          <p className={`text-gray-300 text-sm ${comment.error ? 'text-red-500' : ''}`}>
-                            {comment.comment}
-                          </p>
-                        </div>
-                        {comment.error && (
-                          <div className="absolute -top-1 -right-8 text-red-500">
-                            <AlertTriangle className="w-5 h-5" />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    <div ref={commentsEndRef} />
-                  </div>
+                  {renderComments()}
 
                   <div className="mt-4 border-t border-gray-700 pt-4">
                     <div className="flex items-center space-x-2">
@@ -852,8 +1160,8 @@ const Live = () => {
             )}
           </div>
         </div>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 };
 

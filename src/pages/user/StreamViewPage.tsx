@@ -24,7 +24,21 @@ import {
   DialogActions,
 } from '@mui/material';
 
-// Interfaces (keep existing interfaces from previous code)
+interface JoinNotification extends CommentType {
+  type: 'join';
+}
+
+interface StreamJoinNotification {
+  streamId: string;
+  user: {
+    userId: string;
+    displayName: string;
+    profileImage: string;
+  };
+  timestamp: string;
+  type: 'join';
+}
+
 export interface UserDto {
   id: string;
   username: string;
@@ -210,16 +224,26 @@ const StreamViewPage: React.FC = () => {
   // }, [streamSocket, streamId, ownUser?.id]);
 
   useEffect(() => {
+    // const joinStream = () => {
+    //   if (streamSocket && streamId && ownUser?.id) {
+    //     console.log('Joining stream:', streamId, 'User:', ownUser.id);
+    //     streamSocket.emit('join_stream', {
+    //       streamId,
+    //       userId: ownUser.id
+    //     });
+    //   }
+    // };
     const joinStream = () => {
       if (streamSocket && streamId && ownUser?.id) {
         console.log('Joining stream:', streamId, 'User:', ownUser.id);
         streamSocket.emit('join_stream', {
           streamId,
-          userId: ownUser.id
+          userId: ownUser.id,
+          displayName: ownUser.displayName,
+          profileImage: ownUser.profileImage || '/api/placeholder/100/100'
         });
       }
     };
-
     const leaveStream = () => {
       if (streamSocket && streamId && ownUser?.id) {
         console.log('Leaving stream:', streamId, 'User:', ownUser.id);
@@ -270,10 +294,69 @@ const StreamViewPage: React.FC = () => {
   }, [streamSocket, streamId, ownUser?.id]);
 
 
+  // useEffect(() => {
+  //   if (streamSocket && streamId) {
+  //     streamSocket.on('new_comment', (commentData: CommentSocketData) => {
+  //       console.log("commentData...", commentData)
+  //       if (commentData.streamId === streamId) {
+  //         setComments(prevComments => {
+  //           const newComment: CommentType = {
+  //             streamId: commentData.streamId,
+  //             user: commentData.user,
+  //             comment: commentData.comment,
+  //             timestamp: commentData.timestamp,
+  //             error: false
+  //           };
+
+  //           return [...prevComments, newComment].sort(
+  //             (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  //           );
+  //         });
+  //       }
+  //     });
+
+  //     streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
+  //       const notification: JoinNotification = {
+  //         streamId: joinData.streamId,
+  //         user: {
+  //           userId: joinData.user.userId,
+  //           displayName: joinData.user.displayName,
+  //           profileImage: joinData.user.profileImage
+  //         },
+  //         comment: `${joinData.user.displayName} joined the stream`,
+  //         timestamp: joinData.timestamp,
+  //         type: 'join'
+  //       };
+  
+  //       setComments(prevComments => {
+  //         const newComments = [...prevComments, notification].sort(
+  //           (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  //         );
+  //         return newComments;
+  //       });
+  //     });
+  
+
+  //     streamSocket.on('reaction_update', (data: ReactionUpdateData) => {
+  //       if (data.streamId === streamId) {
+  //         setStreamData(prevData => ({
+  //           ...prevData,
+  //           status: data.status
+  //         }));
+  //       }
+  //     });
+
+  //     return () => {
+  //       streamSocket.off('new_comment');
+  //       streamSocket.off('reaction_update');
+  //       streamSocket.off('user_joined_stream');
+  //     };
+  //   }
+  // }, [streamSocket, streamId]);
+
   useEffect(() => {
     if (streamSocket && streamId) {
       streamSocket.on('new_comment', (commentData: CommentSocketData) => {
-        console.log("commentData...", commentData)
         if (commentData.streamId === streamId) {
           setComments(prevComments => {
             const newComment: CommentType = {
@@ -283,26 +366,41 @@ const StreamViewPage: React.FC = () => {
               timestamp: commentData.timestamp,
               error: false
             };
-
+  
             return [...prevComments, newComment].sort(
               (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
             );
           });
         }
       });
-
-      streamSocket.on('reaction_update', (data: ReactionUpdateData) => {
-        if (data.streamId === streamId) {
-          setStreamData(prevData => ({
-            ...prevData,
-            status: data.status
-          }));
-        }
+  
+      // Update the user_joined_stream handler
+      streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
+        console.log('Received join notification:', joinData);
+        
+        const notification: JoinNotification = {
+          streamId: joinData.streamId,
+          user: {
+            userId: joinData.user.userId,
+            displayName: joinData.user.displayName,
+            profileImage: joinData.user.profileImage
+          },
+          comment: `${joinData.user.displayName} joined the stream`,
+          timestamp: joinData.timestamp,
+          type: 'join'
+        };
+  
+        setComments(prevComments => {
+          const newComments = [...prevComments, notification].sort(
+            (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          );
+          return newComments;
+        });
       });
-
+  
       return () => {
         streamSocket.off('new_comment');
-        streamSocket.off('reaction_update');
+        streamSocket.off('user_joined_stream');
       };
     }
   }, [streamSocket, streamId]);
@@ -884,7 +982,7 @@ const StreamViewPage: React.FC = () => {
 
             {/* Comments List - Removed overflow-y-auto and scroll-related classes */}
             <div className="flex-grow overflow-y-auto space-y-4 pr-2">
-              {comments.map((comment, index) => (
+              {/* {comments.map((comment, index) => (
                 <div key={index} className="flex items-start space-x-3 relative">
                   <img
                     src={comment.user.profileImage}
@@ -913,7 +1011,43 @@ const StreamViewPage: React.FC = () => {
                     </div>
                   )}
                 </div>
-              ))}
+              ))} */}
+
+
+{comments.map((comment, index) => (
+  <div key={index} className="flex items-start space-x-3 relative">
+    <img
+      src={comment.user.profileImage}
+      alt={comment.user.displayName}
+      className="w-8 h-8 rounded-full"
+    />
+    <div className="flex-grow">
+      <div className="flex items-center space-x-2">
+        <span className="font-semibold text-sm">
+          {comment.user.displayName}
+        </span>
+        <span className="text-xs text-gray-500">
+          {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+        </span>
+      </div>
+      <p className={`text-sm ${
+        (comment as JoinNotification).type === 'join' 
+          ? 'text-purple-600 italic' 
+          : 'text-gray-700'
+      } ${comment.error ? 'text-red-500' : ''}`}>
+        {comment.comment}
+      </p>
+    </div>
+    {comment.error && (
+      <div
+        className="absolute -top-1 -right-8 text-red-500 group"
+        title="Failed to send comment"
+      >
+        <AlertTriangle className="w-5 h-5" />
+      </div>
+    )}
+  </div>
+))}
               {/* Invisible div for scrolling */}
               <div ref={commentsEndRef} />
             </div>
