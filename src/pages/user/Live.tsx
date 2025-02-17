@@ -769,7 +769,7 @@ const Live = () => {
               ? 'text-purple-400 italic'
               : 'text-gray-300'
               } text-sm ${comment.error ? 'text-red-500' : ''}`}>
-              {comment.comment}
+              {'Joined the stream'}
             </p>
           </div>
           {comment.error && (
