@@ -120,16 +120,16 @@ interface CommentSocketData {
   timestamp: string;
 }
 
-interface StreamStatus {
-  likes: number;
-  dislikes: number;
-  views: number;
-}
+// interface StreamStatus {
+//   likes: number;
+//   dislikes: number;
+//   views: number;
+// }
 
-interface ReactionUpdateData {
-  streamId: string;
-  status: StreamStatus;
-}
+// interface ReactionUpdateData {
+//   streamId: string;
+//   status: StreamStatus;
+// }
 
 
 interface ViewerCount {
@@ -1014,7 +1014,7 @@ const StreamViewPage: React.FC = () => {
               ))} */}
 
 
-{comments.map((comment, index) => (
+{/* {comments.map((comment, index) => (
   <div key={index} className="flex items-start space-x-3 relative">
     <img
       src={comment.user.profileImage}
@@ -1036,6 +1036,43 @@ const StreamViewPage: React.FC = () => {
           : 'text-gray-700'
       } ${comment.error ? 'text-red-500' : ''}`}>
         {comment.comment}
+      </p>
+    </div>
+    {comment.error && (
+      <div
+        className="absolute -top-1 -right-8 text-red-500 group"
+        title="Failed to send comment"
+      >
+        <AlertTriangle className="w-5 h-5" />
+      </div>
+    )}
+  </div>
+))} */}
+
+{comments.map((comment, index) => (
+  <div key={index} className="flex items-start space-x-3 relative">
+    <img
+      src={comment.user.profileImage || '/api/placeholder/100/100'}
+      alt={comment.user.displayName || 'User'}
+      className="w-8 h-8 rounded-full"
+    />
+    <div className="flex-grow">
+      <div className="flex items-center space-x-2">
+        <span className="font-semibold text-sm">
+          {comment.user.displayName || 'Anonymous User'}
+        </span>
+        <span className="text-xs text-gray-500">
+          {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+        </span>
+      </div>
+      <p className={`text-sm ${
+        (comment as JoinNotification).type === 'join' 
+          ? 'text-purple-600 italic' 
+          : 'text-gray-700'
+      } ${comment.error ? 'text-red-500' : ''}`}>
+        {(comment as JoinNotification).type === 'join' 
+          ? `${comment.user.displayName || 'Anonymous User'} joined the stream`
+          : comment.comment}
       </p>
     </div>
     {comment.error && (
