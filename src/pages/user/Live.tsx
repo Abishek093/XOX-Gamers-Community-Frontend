@@ -758,9 +758,9 @@ const Live = () => {
           />
           <div className="flex-grow">
             <div className="flex items-center space-x-2">
-              <span className="font-semibold text-sm text-white">
+              {/* <span className="font-semibold text-sm text-white">
                 {comment.user.displayName}
-              </span>
+              </span> */}
               <span className="text-xs text-gray-400">
                 {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
               </span>

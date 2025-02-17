@@ -1058,9 +1058,9 @@ const StreamViewPage: React.FC = () => {
                 />
                 <div className="flex-grow">
                   <div className="flex items-center space-x-2">
-                    <span className="font-semibold text-sm">
+                    {/* <span className="font-semibold text-sm">
                       {comment.user.displayName || 'Anonymous User'}
-                    </span>
+                    </span> */}
                     <span className="text-xs text-gray-500">
                       {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
                     </span>
