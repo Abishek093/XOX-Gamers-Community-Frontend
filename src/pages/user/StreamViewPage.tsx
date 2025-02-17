@@ -385,7 +385,7 @@ const StreamViewPage: React.FC = () => {
             displayName: joinData.user.displayName,
             profileImage: joinData.user.profileImage
           },
-          comment: `${joinData.user.displayName} joined the stream`,
+          comment: `joined the stream`,
           timestamp: joinData.timestamp,
           type: 'join'
         };
