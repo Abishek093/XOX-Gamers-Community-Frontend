@@ -151,7 +151,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
         ) : (
           <div className="flex flex-col items-center justify-center w-full h-full relative">
             <img
-              src="/src/assets/Images_Logo.png"
+              src="https://gamers-community.s3.us-east-1.amazonaws.com/Images_Logo.png"
               className="w-28 h-28 mb-5"
               alt="Upload logo"
             />

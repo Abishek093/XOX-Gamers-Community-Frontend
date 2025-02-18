@@ -24,7 +24,6 @@ const GamingNews: React.FC = () => {
   //     );
   //     const data = await response.json();
       
-  //     // Filter games with images
   //     const gamesWithImages = data.results.filter((game: Game) => game.background_image);
       
   //     setGames(prevGames => {

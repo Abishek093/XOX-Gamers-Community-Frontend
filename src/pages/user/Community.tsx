@@ -401,7 +401,7 @@ const Community: React.FC = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center h-[53vh] bg-white">
                   <img
-                    src="/src/assets/NoImages.png"
+                    src="https://gamers-community.s3.us-east-1.amazonaws.com/NoImages.png"
                     alt="No content available"
                     className="h-20"
                   />
@@ -441,7 +441,7 @@ const Community: React.FC = () => {
             ) : (
               <div className="flex flex-col items-center justify-center h-[53vh] bg-white">
                 <img
-                  src="/src/assets/NoImages.png"
+                  src="https://gamers-community.s3.us-east-1.amazonaws.com/NoImages.png"
                   alt="No content available"
                   className="h-20"
                 />
