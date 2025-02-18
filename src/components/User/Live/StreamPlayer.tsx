@@ -248,7 +248,8 @@ const StreamPlayer: React.FC<StreamPlayerProps> = ({ streamKey, onError }) => {
 
   const constructStreamUrl = (key: string) => {
     const cleanKey = key.replace(/^\/+|\/+$/g, '');
-    return `http://35.244.42.12:8080/hls/live/${cleanKey}/index.m3u8`;
+    return `http://live.xoxgaming.shop:8080/hls/live/${cleanKey}/index.m3u8`;
+    // return `http://localhost:8080/hls/live/${cleanKey}/index.m3u8`
   };
 
   const checkStreamAvailability = async (url: string): Promise<boolean> => {
