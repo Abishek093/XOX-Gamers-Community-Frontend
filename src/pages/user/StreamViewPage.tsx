@@ -1090,7 +1090,7 @@ const StreamViewPage: React.FC = () => {
                       : 'text-gray-700'} ${comment.error ? 'text-red-500' : ''}`}>
                       {(comment as JoinNotification).type === 'join'
                         ? 'Joined the stream'
-                        : comment.comment}  // Show the actual comment text
+                        : comment.comment}  
                     </p>
                   </div>
                   {comment.error && (
