@@ -375,9 +375,29 @@ const StreamViewPage: React.FC = () => {
       });
   
       // Update the user_joined_stream handler
-      streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
-        console.log('Received join notification:', joinData);
+      // streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
+      //   console.log('Received join notification:', joinData);
         
+      //   const notification: JoinNotification = {
+      //     streamId: joinData.streamId,
+      //     user: {
+      //       userId: joinData.user.userId,
+      //       displayName: joinData.user.displayName,
+      //       profileImage: joinData.user.profileImage
+      //     },
+      //     comment: `joined the stream`,
+      //     timestamp: joinData.timestamp,
+      //     type: 'join'
+      //   };
+  
+      //   setComments(prevComments => {
+      //     const newComments = [...prevComments, notification].sort(
+      //       (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      //     );
+      //     return newComments;
+      //   });
+      // });
+      streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
         const notification: JoinNotification = {
           streamId: joinData.streamId,
           user: {
@@ -385,7 +405,7 @@ const StreamViewPage: React.FC = () => {
             displayName: joinData.user.displayName,
             profileImage: joinData.user.profileImage
           },
-          comment: `joined the stream`,
+          comment: `${joinData.user.displayName} joined the stream`,
           timestamp: joinData.timestamp,
           type: 'join'
         };
@@ -1058,9 +1078,9 @@ const StreamViewPage: React.FC = () => {
                 />
                 <div className="flex-grow">
                   <div className="flex items-center space-x-2">
-                    {/* <span className="font-semibold text-sm">
+                    <span className="font-semibold text-sm">
                       {comment.user.displayName || 'Anonymous User'}
-                    </span> */}
+                    </span>
                     <span className="text-xs text-gray-500">
                       {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
                     </span>
