@@ -82,7 +82,7 @@ const ChatBody: React.FC<ChatBodyProps> = ({ selectedChat, ownUser, messages }) 
     if (!selectedChat || !ownUser || !userSocket || !messages.length) return;
   
     const now = Date.now();
-    if (now - lastSeenUpdateRef.current < 1000) return; // Debounce check
+    if (now - lastSeenUpdateRef.current < 1000) return; 
   
     const unseenMessages = messages.filter(msg =>
       msg.sender._id !== ownUser.id &&

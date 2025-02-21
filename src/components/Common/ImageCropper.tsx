@@ -209,7 +209,6 @@
 
 
 
-// ImageCropper.tsx
 
 import React, { useState, useCallback } from 'react';
 import Cropper, { Area } from 'react-easy-crop';

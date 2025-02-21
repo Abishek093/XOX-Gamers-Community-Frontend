@@ -68,7 +68,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
     if (!allowedTypes.includes(file.type)) {
       toast.error("Only JPG and PNG images are allowed.");
-      return; // Do not proceed with setting the image in the state
+      return; 
     }
 
     try {

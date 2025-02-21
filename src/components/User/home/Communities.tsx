@@ -3,7 +3,7 @@ import CommunityCard from './CommunityCard';
 import axiosInstance from '../../../services/userServices/axiosInstance';
 import { ICommunityWithCounts } from '../../../interfaces/userInterfaces/apiInterfaces';
 import { toast } from 'sonner';
-import { FaArrowRight } from 'react-icons/fa'; // Import the arrow icon
+import { FaArrowRight } from 'react-icons/fa'; 
 import { useNavigate } from 'react-router-dom';
 
 const Communities: React.FC = () => {

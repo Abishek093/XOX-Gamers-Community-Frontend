@@ -12,28 +12,27 @@ export const AuthSocketHandler: React.FC<{ children: React.ReactNode }> = ({ chi
   
     useEffect(() => {
       if (userSocket) {
-        const handleForceLogout = (data: { message: string }) => {
+        const handleForceLogout = async (data: { message: string }) => {
           console.log("Force logout received:", data);
-          
-          // Dispatch logout action
           dispatch(logout());
           
-          // Show toast notification
-          toast.error(data.message, {
-            duration: 5000,
-            position: 'top-center'
+          // Show toast and wait for it to be displayed
+          toast.error("User Temporarily Blocked", {
+            duration: 3000,
+            onDismiss: () => {
+              // Redirect after toast is dismissed
+              window.location.href = '/login';
+            }
           });
-    
-          // Redirect to login page
-          window.location.href = '/login';
         };
     
         userSocket.on('forceLogout', handleForceLogout);
-    
+
         return () => {
           userSocket.off('forceLogout', handleForceLogout);
         };
       }
     }, [userSocket, user, dispatch]);
+
     return <>{children}</>;
-  };
+};

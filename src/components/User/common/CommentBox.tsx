@@ -88,7 +88,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({ postId, userId, onClose }) => {
         <div className="w-full h-14 border border-gray-400 rounded-md">
           <div className="flex items-center justify-start text-black font-semibold h-full pl-4">Comments</div>
         </div>
-        <CommentSection comments={comments} setComments={setComments} /> {/* Pass setComments */}
+        <CommentSection comments={comments} setComments={setComments} /> 
         <div className="w-full border-t border-gray-300 mt-auto relative">
           <SentimentVerySatisfiedOutlinedIcon
             className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"

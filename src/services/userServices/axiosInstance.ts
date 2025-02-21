@@ -82,6 +82,7 @@ import Cookies from 'js-cookie';
 import { refreshAccessToken } from './api';
 import { logout } from '../../../src/Slices/userSlice/userSlice';
 import { store } from '../../../src/store';
+import { toast } from 'sonner';
 
 // const axiosInstance = axios.create({
 //   baseURL: 'http://localhost:3001/api/',
@@ -127,26 +128,21 @@ axiosInstance.interceptors.response.use(
 
     const originalRequest = error.config;
     
-    // Check for blocked user scenario
     if (error.response && error.response.status === 401) {
       const blockedUserMessage = error.response.data?.message;
       
-      // Specific handling for blocked user
       if (blockedUserMessage === 'User is blocked') {
-        // Remove tokens
         Cookies.remove('UserAccessToken');
         Cookies.remove('UserRefreshToken');
         
-        // Dispatch logout action
         store.dispatch(logout());
         
-        // Optional: You can add a toast or alert to inform the user
         console.log('User is blocked. Logging out automatically.');
-        
+        toast.error("User Temporarily Blocked")
+
         return Promise.reject(error);
       }
       
-      // Existing token refresh logic
       if (!originalRequest._retry) {
         originalRequest._retry = true;
         const refreshToken = Cookies.get('UserRefreshToken');
