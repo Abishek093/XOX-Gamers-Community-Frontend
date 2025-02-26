@@ -574,32 +574,32 @@ const Live = () => {
     }
   };
 
-  useEffect(() => {
-    if (streamSocket && streamData.id) {
-      streamSocket.on('new_comment', (commentData: CommentType) => {
-        if (commentData.streamId === streamData.id) {
-          setComments(prevComments => {
-            const newComments = [...prevComments, commentData]
-              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-            return newComments;
-          });
-        }
-      });
-      streamSocket.on('reaction_update', (data: { streamId: string; status: StreamDto['status'] }) => {
-        if (data.streamId === streamData.id) {
-          setStreamData(prevData => ({
-            ...prevData,
-            status: data.status
-          }));
-        }
-      });
+  // useEffect(() => {
+  //   if (streamSocket && streamData.id) {
+  //     streamSocket.on('new_comment', (commentData: CommentType) => {
+  //       if (commentData.streamId === streamData.id) {
+  //         setComments(prevComments => {
+  //           const newComments = [...prevComments, commentData]
+  //             .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  //           return newComments;
+  //         });
+  //       }
+  //     });
+  //     streamSocket.on('reaction_update', (data: { streamId: string; status: StreamDto['status'] }) => {
+  //       if (data.streamId === streamData.id) {
+  //         setStreamData(prevData => ({
+  //           ...prevData,
+  //           status: data.status
+  //         }));
+  //       }
+  //     });
 
-      return () => {
-        streamSocket.off('new_comment');
-        streamSocket.off('reaction_update');
-      };
-    }
-  }, [streamSocket, streamData.id]);
+  //     return () => {
+  //       streamSocket.off('new_comment');
+  //       streamSocket.off('reaction_update');
+  //     };
+  //   }
+  // }, [streamSocket, streamData.id]);
 
   // useEffect(() => {
   //   const checkStreamStatus = async () => {
