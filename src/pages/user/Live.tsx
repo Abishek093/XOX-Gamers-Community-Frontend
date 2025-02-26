@@ -320,6 +320,98 @@ const Live = () => {
   // }, [streamSocket, streamData.id]);
 
 
+  // useEffect(() => {
+  //   if (streamSocket && streamData.id) {
+  //     const joinStream = () => {
+  //       streamSocket.emit('join_stream', {
+  //         streamId: streamData.id,
+  //         userId: ownUser?.id,
+  //         displayName: ownUser?.displayName,
+  //         profileImage: ownUser?.profileImage || '/api/placeholder/100/100'
+  //       });
+  //     };
+
+  //     streamSocket.on('connect', () => {
+  //       console.log('Socket connected');
+  //       setIsSocketConnected(true);
+  //       joinStream();
+  //     });
+
+  //     streamSocket.on('disconnect', () => {
+  //       console.log('Socket disconnected');
+  //       setIsSocketConnected(false);
+  //     });
+
+  //     streamSocket.on('viewer_update', (data: {
+  //       streamId: string;
+  //       viewerCount: ViewerCount
+  //     }) => {
+  //       if (data.streamId === streamData.id) {
+  //         setViewerCount(data.viewerCount);
+  //       }
+  //     });
+
+  //     streamSocket.on('reaction_update', (data: {
+  //       streamId: string;
+  //       status: StreamDto['status']
+  //     }) => {
+  //       if (data.streamId === streamData.id) {
+  //         setStreamData(prevData => ({
+  //           ...prevData,
+  //           status: data.status
+  //         }));
+  //       }
+  //     });
+
+  //     streamSocket.on('new_comment', (commentData: CommentType) => {
+  //       if (commentData.streamId === streamData.id) {
+  //         setComments(prevComments => {
+  //           const newComments = [...prevComments, commentData]
+  //             .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  //           return newComments;
+  //         });
+  //       }
+  //     });
+
+  //     streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
+  //       console.log('Received join notification:', joinData);
+
+  //       const notification: JoinNotification = {
+  //         streamId: joinData.streamId,
+  //         user: {
+  //           userId: joinData.user.userId,
+  //           displayName: joinData.user.displayName,
+  //           profileImage: joinData.user.profileImage
+  //         },
+  //         comment: `joined the stream`,
+  //         timestamp: joinData.timestamp,
+  //         type: 'join'
+  //       };
+
+  //       setComments(prevComments => {
+  //         const newComments = [...prevComments, notification].sort(
+  //           (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  //         );
+  //         return newComments;
+  //       });
+  //     });
+
+  //     if (streamSocket.connected) {
+  //       setIsSocketConnected(true);
+  //       joinStream();
+  //     }
+
+  //     return () => {
+  //       streamSocket.off('connect');
+  //       streamSocket.off('disconnect');
+  //       streamSocket.off('viewer_update');
+  //       streamSocket.off('reaction_update');
+  //       streamSocket.off('new_comment');
+  //       streamSocket.off('user_joined_stream');
+  //     };
+  //   }
+  // }, [streamSocket, streamData.id, ownUser?.id]);
+
   useEffect(() => {
     if (streamSocket && streamData.id) {
       const joinStream = () => {
@@ -330,18 +422,18 @@ const Live = () => {
           profileImage: ownUser?.profileImage || '/api/placeholder/100/100'
         });
       };
-
+  
       streamSocket.on('connect', () => {
         console.log('Socket connected');
         setIsSocketConnected(true);
         joinStream();
       });
-
+  
       streamSocket.on('disconnect', () => {
         console.log('Socket disconnected');
         setIsSocketConnected(false);
       });
-
+  
       streamSocket.on('viewer_update', (data: {
         streamId: string;
         viewerCount: ViewerCount
@@ -350,8 +442,7 @@ const Live = () => {
           setViewerCount(data.viewerCount);
         }
       });
-
-      // Handle reaction updates
+  
       streamSocket.on('reaction_update', (data: {
         streamId: string;
         status: StreamDto['status']
@@ -363,21 +454,30 @@ const Live = () => {
           }));
         }
       });
-
-      // Handle new comments and join notifications
+  
+      // Only set up ONE listener for 'new_comment' events
       streamSocket.on('new_comment', (commentData: CommentType) => {
         if (commentData.streamId === streamData.id) {
           setComments(prevComments => {
+            // Check if comment already exists to prevent duplicates
+            const commentExists = prevComments.some(
+              c => c.timestamp === commentData.timestamp && 
+                  c.user.userId === commentData.user.userId && 
+                  c.comment === commentData.comment
+            );
+            
+            if (commentExists) return prevComments;
+            
             const newComments = [...prevComments, commentData]
               .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
             return newComments;
           });
         }
       });
-
+  
       streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
         console.log('Received join notification:', joinData);
-
+  
         const notification: JoinNotification = {
           streamId: joinData.streamId,
           user: {
@@ -389,7 +489,7 @@ const Live = () => {
           timestamp: joinData.timestamp,
           type: 'join'
         };
-
+  
         setComments(prevComments => {
           const newComments = [...prevComments, notification].sort(
             (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -397,12 +497,12 @@ const Live = () => {
           return newComments;
         });
       });
-
+  
       if (streamSocket.connected) {
         setIsSocketConnected(true);
         joinStream();
       }
-
+  
       return () => {
         streamSocket.off('connect');
         streamSocket.off('disconnect');
@@ -413,7 +513,6 @@ const Live = () => {
       };
     }
   }, [streamSocket, streamData.id, ownUser?.id]);
-
 
 
   // const handleReaction = async (action: 'like' | 'dislike') => {
