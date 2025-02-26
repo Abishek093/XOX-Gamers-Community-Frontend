@@ -232,20 +232,110 @@ const Live = () => {
   //   }
   // }, [streamSocket, streamData.id]);
 
+  // useEffect(() => {
+  //   if (streamSocket && streamData.id) {
+  //     // Handle socket connection status
+  //     streamSocket.on('connect', () => {
+  //       console.log('Socket connected');
+  //       setIsSocketConnected(true);
+  //     });
+
+  //     streamSocket.on('disconnect', () => {
+  //       console.log('Socket disconnected');
+  //       setIsSocketConnected(false);
+  //     });
+
+  //     // Handle viewer updates
+  //     streamSocket.on('viewer_update', (data: {
+  //       streamId: string;
+  //       viewerCount: ViewerCount
+  //     }) => {
+  //       if (data.streamId === streamData.id) {
+  //         setViewerCount(data.viewerCount);
+  //       }
+  //     });
+
+  //     // Handle reaction updates
+  //     streamSocket.on('reaction_update', (data: {
+  //       streamId: string;
+  //       status: StreamDto['status']
+  //     }) => {
+  //       if (data.streamId === streamData.id) {
+  //         setStreamData(prevData => ({
+  //           ...prevData,
+  //           status: data.status
+  //         }));
+  //       }
+  //     });
+
+  //     // Handle new comments and join notifications
+  //     streamSocket.on('new_comment', (commentData: CommentType) => {
+  //       if (commentData.streamId === streamData.id) {
+  //         setComments(prevComments => {
+  //           const newComments = [...prevComments, commentData]
+  //             .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  //           return newComments;
+  //         });
+  //       }
+  //     });
+
+  //     streamSocket.on('user_joined_stream', (joinData: StreamJoinNotification) => {
+  //       console.log('Received join notification:', joinData);
+
+  //       const notification: JoinNotification = {
+  //         streamId: joinData.streamId,
+  //         user: {
+  //           userId: joinData.user.userId,
+  //           displayName: joinData.user.displayName,
+  //           profileImage: joinData.user.profileImage
+  //         },
+  //         comment: `joined the stream`,
+  //         timestamp: joinData.timestamp,
+  //         type: 'join'
+  //       };
+
+  //       setComments(prevComments => {
+  //         const newComments = [...prevComments, notification].sort(
+  //           (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  //         );
+  //         return newComments;
+  //       });
+  //     });
+
+  //     return () => {
+  //       streamSocket.off('connect');
+  //       streamSocket.off('disconnect');
+  //       streamSocket.off('viewer_update');
+  //       streamSocket.off('reaction_update');
+  //       streamSocket.off('new_comment');
+  //       streamSocket.off('user_joined_stream');
+  //     };
+  //   }
+  // }, [streamSocket, streamData.id]);
+
+
   useEffect(() => {
     if (streamSocket && streamData.id) {
-      // Handle socket connection status
+      const joinStream = () => {
+        streamSocket.emit('join_stream', {
+          streamId: streamData.id,
+          userId: ownUser?.id,
+          displayName: ownUser?.displayName,
+          profileImage: ownUser?.profileImage || '/api/placeholder/100/100'
+        });
+      };
+  
       streamSocket.on('connect', () => {
         console.log('Socket connected');
         setIsSocketConnected(true);
+        joinStream();
       });
-
+  
       streamSocket.on('disconnect', () => {
         console.log('Socket disconnected');
         setIsSocketConnected(false);
       });
-
-      // Handle viewer updates
+  
       streamSocket.on('viewer_update', (data: {
         streamId: string;
         viewerCount: ViewerCount
@@ -302,6 +392,11 @@ const Live = () => {
         });
       });
 
+      if (streamSocket.connected) {
+        setIsSocketConnected(true);
+        joinStream();
+      }
+
       return () => {
         streamSocket.off('connect');
         streamSocket.off('disconnect');
@@ -311,7 +406,9 @@ const Live = () => {
         streamSocket.off('user_joined_stream');
       };
     }
-  }, [streamSocket, streamData.id]);
+  }, [streamSocket, streamData.id, ownUser?.id]);
+
+
 
   // const handleReaction = async (action: 'like' | 'dislike') => {
   //   if (!ownUser?.id || !streamData.id) return;
@@ -475,12 +572,13 @@ const Live = () => {
     if (streamSocket && streamData.id) {
       streamSocket.on('new_comment', (commentData: CommentType) => {
         if (commentData.streamId === streamData.id) {
-          setComments(prevComments => [...prevComments, commentData]
-            .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-          );
+          setComments(prevComments => {
+            const newComments = [...prevComments, commentData]
+              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+            return newComments;
+          });
         }
       });
-
       streamSocket.on('reaction_update', (data: { streamId: string; status: StreamDto['status'] }) => {
         if (data.streamId === streamData.id) {
           setStreamData(prevData => ({
@@ -497,12 +595,50 @@ const Live = () => {
     }
   }, [streamSocket, streamData.id]);
 
+  // useEffect(() => {
+  //   const checkStreamStatus = async () => {
+  //     try {
+  //       if (ownUser?.id) {
+  //         const response = await axiosInstance.get(`streaming/status/${ownUser.id}`);
+  //         console.log("checkStreamStatus", response)
+  //         if (response.data && response.data.isLive) {
+  //           const streamDto: StreamDto = {
+  //             ...response.data,
+  //             user: {
+  //               ...response.data.user,
+  //               profileImage: response.data.user.profileImage || '/api/placeholder/100/100'
+  //             },
+  //             status: response.data.status || {
+  //               likes: 0,
+  //               dislikes: 0,
+  //               views: 0
+  //             }
+  //           };
+  //           setStreamData(streamDto);
+  //           setIsSetupComplete(true);
+  //           setStreamKey(response.data.streamKey);
+  //           setStreamServer(response.data.streamServer);
+
+  //           // Fetch comments if stream is live
+  //           const commentsResponse = await axiosInstance.get(`streaming/get-stream-comments/${response.data.id}`);
+  //           setComments(commentsResponse.data.sort((a: CommentType, b: CommentType) =>
+  //             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  //           ));
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error("Error checking stream status:", error);
+  //     }
+  //   };
+
+  //   checkStreamStatus();
+  // }, [ownUser?.id]);
+
   useEffect(() => {
     const checkStreamStatus = async () => {
       try {
         if (ownUser?.id) {
           const response = await axiosInstance.get(`streaming/status/${ownUser.id}`);
-          console.log("checkStreamStatus", response)
           if (response.data && response.data.isLive) {
             const streamDto: StreamDto = {
               ...response.data,
@@ -520,8 +656,15 @@ const Live = () => {
             setIsSetupComplete(true);
             setStreamKey(response.data.streamKey);
             setStreamServer(response.data.streamServer);
-
-            // Fetch comments if stream is live
+            
+            // Set initial viewer count
+            if (response.data.viewerCount) {
+              setViewerCount({
+                currentViewers: response.data.viewerCount.currentViewers || 0,
+                totalUniqueViewers: response.data.viewerCount.totalUniqueViewers || 0
+              });
+            }
+  
             const commentsResponse = await axiosInstance.get(`streaming/get-stream-comments/${response.data.id}`);
             setComments(commentsResponse.data.sort((a: CommentType, b: CommentType) =>
               new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -532,10 +675,10 @@ const Live = () => {
         console.error("Error checking stream status:", error);
       }
     };
-
+  
     checkStreamStatus();
   }, [ownUser?.id]);
-
+  
   const scrollToBottom = () => {
     commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -758,9 +901,9 @@ const Live = () => {
           />
           <div className="flex-grow">
             <div className="flex items-center space-x-2">
-              {/* <span className="font-semibold text-sm text-white">
-                {comment.user.displayName}
-              </span> */}
+              <span className="font-semibold text-sm text-white">
+                {comment.user.displayName || 'Anonymous User'}
+              </span>
               <span className="text-xs text-gray-400">
                 {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
               </span>
@@ -769,7 +912,9 @@ const Live = () => {
               ? 'text-purple-400 italic'
               : 'text-gray-300'
               } text-sm ${comment.error ? 'text-red-500' : ''}`}>
-              {'Joined the stream'}
+              {(comment as JoinNotification).type === 'join'
+                ? `${comment.user.displayName} joined the stream`
+                : comment.comment}
             </p>
           </div>
           {comment.error && (
@@ -788,7 +933,7 @@ const Live = () => {
     <div className="flex items-center space-x-2">
       <Users className="h-5 w-5 text-gray-400" />
       <span className="text-gray-300">
-        {isSocketConnected
+        {isSocketConnected && streamData.isLive
           ? `${viewerCount.currentViewers.toLocaleString()} watching now`
           : 'Connecting...'}
       </span>

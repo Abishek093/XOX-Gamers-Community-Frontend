@@ -874,6 +874,8 @@ const ChatPage: React.FC = () => {
     }
 
     userSocket.emit('join_room', selectedChat._id);
+    console.log(`Attempting to join chat room: ${selectedChat._id}`);
+
     currentRoomRef.current = selectedChat._id;
 
     return () => {
