@@ -904,12 +904,12 @@ const Live = () => {
         error: false
       };
 
-      setComments(prevComments => {
-        const newComments = [...prevComments, commentToAdd].sort(
-          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        );
-        return newComments;
-      });
+      // setComments(prevComments => {
+      //   const newComments = [...prevComments, commentToAdd].sort(
+      //     (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      //   );
+      //   return newComments;
+      // });
       setNewComment('');
 
       // Emit the comment with a callback
