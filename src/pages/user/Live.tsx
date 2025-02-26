@@ -903,16 +903,9 @@ const Live = () => {
         timestamp: new Date().toISOString(),
         error: false
       };
-
-      // setComments(prevComments => {
-      //   const newComments = [...prevComments, commentToAdd].sort(
-      //     (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      //   );
-      //   return newComments;
-      // });
-      setNewComment('');
-
-      // Emit the comment with a callback
+  
+      setNewComment(''); // Clear the input immediately
+  
       streamSocket.emit('new_comment', commentToAdd, (response: CommentSocketResponse) => {
         if (!response || !response.success) {
           console.error('Failed to send comment:', response?.message);
