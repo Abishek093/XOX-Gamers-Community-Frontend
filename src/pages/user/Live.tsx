@@ -126,6 +126,12 @@ interface GuidelineStep {
   description: string;
 }
 
+interface CommentSocketResponse {
+  success: boolean;
+  message?: string;
+}
+
+
 const guidelines: GuidelineStep[] = [
   {
     image: 'https://gamers-community.s3.us-east-1.amazonaws.com/step+1.jpeg',
@@ -324,18 +330,18 @@ const Live = () => {
           profileImage: ownUser?.profileImage || '/api/placeholder/100/100'
         });
       };
-  
+
       streamSocket.on('connect', () => {
         console.log('Socket connected');
         setIsSocketConnected(true);
         joinStream();
       });
-  
+
       streamSocket.on('disconnect', () => {
         console.log('Socket disconnected');
         setIsSocketConnected(false);
       });
-  
+
       streamSocket.on('viewer_update', (data: {
         streamId: string;
         viewerCount: ViewerCount
@@ -656,7 +662,7 @@ const Live = () => {
             setIsSetupComplete(true);
             setStreamKey(response.data.streamKey);
             setStreamServer(response.data.streamServer);
-            
+
             // Set initial viewer count
             if (response.data.viewerCount) {
               setViewerCount({
@@ -664,7 +670,7 @@ const Live = () => {
                 totalUniqueViewers: response.data.viewerCount.totalUniqueViewers || 0
               });
             }
-  
+
             const commentsResponse = await axiosInstance.get(`streaming/get-stream-comments/${response.data.id}`);
             setComments(commentsResponse.data.sort((a: CommentType, b: CommentType) =>
               new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -675,10 +681,10 @@ const Live = () => {
         console.error("Error checking stream status:", error);
       }
     };
-  
+
     checkStreamStatus();
   }, [ownUser?.id]);
-  
+
   const scrollToBottom = () => {
     commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -852,6 +858,38 @@ const Live = () => {
   //     });
   //   }
   // };
+  // const handleSendComment = () => {
+  //   if (newComment.trim() && streamSocket && ownUser && ownUser.id && streamData.id) {
+  //     const commentToAdd: CommentType = {
+  //       streamId: streamData.id,
+  //       user: {
+  //         userId: ownUser.id,
+  //         displayName: ownUser.displayName,
+  //         profileImage: ownUser.profileImage
+  //       },
+  //       comment: newComment,
+  //       timestamp: new Date().toISOString(),
+  //       error: false
+  //     };
+
+  //     setComments(prevComments => [...prevComments, commentToAdd]);
+  //     setNewComment('');
+
+  //     streamSocket.emit('send_comment', commentToAdd, (response: { success: boolean }) => {
+  //       if (!response.success) {
+  //         setComments(prevComments =>
+  //           prevComments.map(comment =>
+  //             comment.timestamp === commentToAdd.timestamp
+  //               ? { ...comment, error: true }
+  //               : comment
+  //           )
+  //         );
+  //         toast.error('Failed to send comment');
+  //       }
+  //     });
+  //   }
+  // };
+
   const handleSendComment = () => {
     if (newComment.trim() && streamSocket && ownUser && ownUser.id && streamData.id) {
       const commentToAdd: CommentType = {
@@ -866,19 +904,26 @@ const Live = () => {
         error: false
       };
 
-      setComments(prevComments => [...prevComments, commentToAdd]);
+      setComments(prevComments => {
+        const newComments = [...prevComments, commentToAdd].sort(
+          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+        return newComments;
+      });
       setNewComment('');
 
-      streamSocket.emit('send_comment', commentToAdd, (response: { success: boolean }) => {
-        if (!response.success) {
-          setComments(prevComments =>
-            prevComments.map(comment =>
+      // Emit the comment with a callback
+      streamSocket.emit('new_comment', commentToAdd, (response: CommentSocketResponse) => {
+        if (!response || !response.success) {
+          console.error('Failed to send comment:', response?.message);
+          setComments((prevComments) =>
+            prevComments.map((comment) =>
               comment.timestamp === commentToAdd.timestamp
                 ? { ...comment, error: true }
                 : comment
             )
           );
-          toast.error('Failed to send comment');
+          toast.error(response?.message || 'Failed to send comment');
         }
       });
     }
@@ -889,7 +934,11 @@ const Live = () => {
     setGuidelineModal(false);
   };
 
-
+  const handleCommentKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSendComment();
+    }
+  };
   const renderComments = () => (
     <div className="flex-grow overflow-y-auto space-y-4 pr-2">
       {comments.map((comment, index) => (
@@ -1284,12 +1333,20 @@ const Live = () => {
                   <div className="mt-4 border-t border-gray-700 pt-4">
                     <div className="flex items-center space-x-2">
                       <UserCircle2 className="w-10 h-10 text-gray-400" />
-                      <input
+                      {/* <input
                         type="text"
                         placeholder="Write a comment..."
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSendComment()}
+                        className="flex-grow bg-gray-700 rounded-full px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+                      /> */}
+                      <input
+                        type="text"
+                        placeholder="Write a comment..."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        onKeyPress={handleCommentKeyPress}
                         className="flex-grow bg-gray-700 rounded-full px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
                       />
                       <button
